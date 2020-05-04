@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:saca/models/User.dart';
+import 'package:saca/models/user.model.dart';
 import 'package:saca/settings.dart';
 
 class UserRepository {

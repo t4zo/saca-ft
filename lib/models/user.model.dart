@@ -3,9 +3,13 @@ class User {
   String username;
   String email;
   List<String> roles;
-  Null token;
+  String token;
 
   User({this.id, this.username, this.email, this.roles, this.token});
+
+  bool isAuthenticated() {
+    return this.token.isEmpty;
+  }
 
   User.fromJson(Map<String, dynamic> json) {
     id = json['id'];

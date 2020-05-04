@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:saca/screens/home.dart';
-import 'package:saca/screens/signIn.dart';
-import 'package:saca/screens/signUp.dart';
+import 'package:saca/views/home.views.dart';
+import 'package:saca/views/signin.views.dart';
+import 'package:saca/views/signup.views.dart';
 
 class TabsScreen extends StatefulWidget {
   @override
@@ -17,9 +17,9 @@ class _TabsScreenState extends State<TabsScreen> {
     super.initState();
     setState(() {
       _screens = [
-        {'screen': HomeScreen(), 'title': 'Categorias'},
-        {'screen': SignInScreen(), 'title': 'Entrar'},
-        {'screen': SignUpScreen(), 'title': 'Registrar'},
+        {'screen': HomeView(), 'title': 'Categorias'},
+        {'screen': SignInView(), 'title': 'Entrar'},
+        {'screen': SignUpView(), 'title': 'Registrar'},
       ];
     });
   }
@@ -32,8 +32,6 @@ class _TabsScreenState extends State<TabsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // bool _signedIn = true;
-
     return Scaffold(
       // appBar: AppBar(
       //   title: Text(_screens[_selectScreenIndex]['title']),
@@ -49,7 +47,7 @@ class _TabsScreenState extends State<TabsScreen> {
           BottomNavigationBarItem(
             backgroundColor: Theme.of(context).primaryColor,
             icon: Icon(Icons.home),
-            title: Text('Figuras'),
+            title: Text('Categorias'),
           ),
           BottomNavigationBarItem(
             backgroundColor: Theme.of(context).primaryColor,

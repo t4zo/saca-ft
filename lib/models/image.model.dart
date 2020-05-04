@@ -1,26 +1,32 @@
-class Card {
+class Image {
   int categoryId;
   Null category;
+  int userId;
+  Null user;
   String name;
+  String url;
   String ext;
-  String base64;
   int id;
 
-  Card({
+  Image({
     this.categoryId,
     this.category,
+    this.userId,
+    this.user,
     this.name,
+    this.url,
     this.ext,
-    this.base64,
     this.id,
   });
 
-  Card.fromJson(Map<String, dynamic> json) {
+  Image.fromJson(Map<String, dynamic> json) {
     categoryId = json['categoryId'];
     category = json['category'];
+    userId = json['userId'];
+    user = json['user'];
     name = json['name'];
+    url = json['url'];
     ext = json['ext'];
-    base64 = json['base64'];
     id = json['id'];
   }
 
@@ -28,9 +34,11 @@ class Card {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['categoryId'] = this.categoryId;
     data['category'] = this.category;
+    data['userId'] = this.userId;
+    data['user'] = this.user;
     data['name'] = this.name;
+    data['url'] = this.url;
     data['ext'] = this.ext;
-    data['base64'] = this.base64;
     data['id'] = this.id;
     return data;
   }

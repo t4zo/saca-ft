@@ -1,24 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:saca/screens/home.dart';
+import 'package:saca/views/home.views.dart';
 
-class SignUpScreen extends StatefulWidget {
+class SignInView extends StatefulWidget {
   static const routeName = '/signin';
 
   @override
-  _SignUpScreenState createState() => _SignUpScreenState();
+  _SignInViewState createState() => _SignInViewState();
 }
 
-class _SignUpScreenState extends State<SignUpScreen> {
-  final usernameController = TextEditingController();
+class _SignInViewState extends State<SignInView> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
-  final confirmPasswordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: SingleChildScrollView(
+        child: Container(
+          height: MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top - 56,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
@@ -27,10 +26,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 scale: 4,
                 semanticLabel: 'Logo SACA',
               ),
-              // Text(
-              //   'SACA',
-              //   style: TextStyle(fontSize: 40),
-              // ),
               Container(
                 padding: EdgeInsets.symmetric(
                     horizontal: MediaQuery.of(context).size.width * 0.15),
@@ -39,16 +34,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   // mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
                     TextField(
-                      controller: usernameController,
-                      decoration: InputDecoration(
-                        labelText: 'Usuario',
-                        // border: OutlineInputBorder(),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    TextField(
                       controller: emailController,
                       decoration: InputDecoration(
                         labelText: 'Email',
@@ -56,7 +41,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                     ),
                     SizedBox(
-                      height: 10,
+                      height: 20,
                     ),
                     TextField(
                       controller: passwordController,
@@ -68,23 +53,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     SizedBox(
                       height: 10,
                     ),
-                    TextField(
-                      controller: confirmPasswordController,
-                      decoration: InputDecoration(
-                        labelText: 'Confirmar Senha',
-                        // border: OutlineInputBorder(),
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [Text('Esqueceu a senha?')],
                     ),
                   ],
                 ),
               ),
               RaisedButton(
-                child: Text('Registrar'),
+                child: Text('Entrar'),
                 elevation: 2,
                 color: Theme.of(context).primaryColor,
                 textColor: Colors.white,
                 onPressed: () =>
-                    Navigator.pushNamed(context, HomeScreen.routeName),
+                    Navigator.pushNamed(context, HomeView.routeName),
               ),
             ],
           ),
