@@ -3,9 +3,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:saca/stores/app.store.dart';
+import 'package:saca/stores/user.store.dart';
+import 'package:saca/stores/category.store.dart';
 
-import 'package:saca/screens/tabs.screen.dart';
+import 'package:saca/navigations/tab.navigation.dart';
+import 'package:saca/views/Images/create.view.dart';
 
 class MyHttpOverrides extends HttpOverrides {
   @override
@@ -28,16 +30,15 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  // bool _signedIn = true;
-
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        Provider<AppStore>.value(
-          value: AppStore(),
-        ),
+        Provider<CategoryStore>(create: (_) => CategoryStore()),
+        Provider<UserStore>(create: (_) => UserStore()),
       ],
+      // return Provider<AppStore>(
+      // create: (_) => AppStore(),
       child: MaterialApp(
         title: 'SACA',
         debugShowCheckedModeBanner: false,
@@ -55,7 +56,7 @@ class _MyAppState extends State<MyApp> {
         initialRoute: '/',
         routes: {
           '/': (ctx) => TabsScreen(),
-          // SignInView.routeName: (ctx) => SignInView(),
+          CreateImage.routeName: (ctx) => CreateImage(),
           // SignUpView.routeName: (ctx) => SignUpView(),
         },
         onGenerateRoute: (settings) {

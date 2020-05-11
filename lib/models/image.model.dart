@@ -1,12 +1,12 @@
 class Image {
-  int categoryId;
+  int categoryId = 0;
   Null category;
-  int userId;
+  int userId = 0;
   Null user;
-  String name;
-  String url;
-  String ext;
-  int id;
+  String name = '';
+  String url = '';
+  String ext = '';
+  int id = 0;
 
   Image({
     this.categoryId,

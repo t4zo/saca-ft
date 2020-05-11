@@ -1,11 +1,11 @@
 import 'package:saca/models/image.model.dart';
 
 class Category {
-  String name;
-  String iconName;
+  String name = '';
+  String iconName = '';
   Null userCategories;
-  List<Image> images;
-  int id;
+  List<Image> images = [Image()];
+  int id = 0;
 
   Category({
     this.name,
