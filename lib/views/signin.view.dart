@@ -42,20 +42,20 @@ class _SignInViewState extends State<SignInView> {
     _passwordFocusNode.dispose();
   }
 
-  void _signIn() {
+  Future _signIn() async {
     final isValid = _form.currentState.validate();
     if (!isValid) return;
 
     _form.currentState.save();
 
-    AuthController().authenticate(model, context);
+    await AuthController().authenticate(model, context);
   }
 
   void _signOut() {
     AuthController().signOut(context);
   }
 
-  void _handleSignInAndOut() {
+  Future _handleSignInAndOut() async {
     final _userStore = Provider.of<UserStore>(context, listen: false);
 
     setState(() {
@@ -64,7 +64,7 @@ class _SignInViewState extends State<SignInView> {
 
     // Timer(Duration(seconds: 5), () {
     if (!_userStore.isAuthenticated) {
-      _signIn();
+      await _signIn();
       Navigator.pushNamed(context, HomeView.routeName);
     } else {
       _signOut();
@@ -109,81 +109,81 @@ class _SignInViewState extends State<SignInView> {
                         horizontal: MediaQuery.of(context).size.width * 0.15),
                     child: Form(
                       key: _form,
-                      child: Observer(
-                        builder: (ctx) => Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            TextFormField(
-                              initialValue: _initialValues['email'],
-                              enabled: !_userStore.isAuthenticated,
-                              textInputAction: TextInputAction.next,
-                              onFieldSubmitted: (_) => FocusScope.of(context)
-                                  .requestFocus(_passwordFocusNode),
-                              decoration:
-                                  const InputDecoration(labelText: 'Email'),
-                              validator: (value) {
-                                if (value.isEmpty)
-                                  return 'Por favor, informe seu email';
-                                return null;
-                              },
-                              onSaved: (value) => model.email = value,
-                            ),
-                            SizedBox(
-                              height: 20,
-                            ),
-                            TextFormField(
-                              // initialValue: _initialValues['password'],
-                              obscureText: true,
-                              enabled: !_userStore.isAuthenticated,
-                              textInputAction: TextInputAction.done,
-                              focusNode: _passwordFocusNode,
-                              decoration:
-                                  const InputDecoration(labelText: 'Senha'),
-                              validator: (value) {
-                                if (value.isEmpty)
-                                  return 'Por favor, informe sua senha';
-                                return null;
-                              },
-                              onSaved: (value) => model.password = value,
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: FlatButton(
-                                padding: const EdgeInsets.only(left: 0),
-                                child: Text(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          TextFormField(
+                            initialValue: _initialValues['email'],
+                            enabled: !_userStore.isAuthenticated,
+                            textInputAction: TextInputAction.next,
+                            onFieldSubmitted: (_) => FocusScope.of(context)
+                                .requestFocus(_passwordFocusNode),
+                            decoration:
+                                const InputDecoration(labelText: 'Email'),
+                            validator: (value) {
+                              if (value.isEmpty)
+                                return 'Por favor, informe seu email';
+                              return null;
+                            },
+                            onSaved: (value) => model.email = value,
+                          ),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          TextFormField(
+                            // initialValue: _initialValues['password'],
+                            obscureText: true,
+                            enabled: !_userStore.isAuthenticated,
+                            textInputAction: TextInputAction.done,
+                            focusNode: _passwordFocusNode,
+                            decoration:
+                                const InputDecoration(labelText: 'Senha'),
+                            validator: (value) {
+                              if (value.isEmpty)
+                                return 'Por favor, informe sua senha';
+                              return null;
+                            },
+                            onSaved: (value) => model.password = value,
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: FlatButton(
+                              padding: const EdgeInsets.only(left: 0),
+                              child: Observer(
+                                builder: (ctx) => Text(
                                   _userStore.isAuthenticated
                                       ? 'Remover conta'
                                       : 'Esqueceu a senha?',
                                 ),
-                                onPressed: () => _userStore.isAuthenticated
-                                    ? _handleRemoveAccount
-                                    : _handleRecoverPassword,
                               ),
+                              onPressed: () => _userStore.isAuthenticated
+                                  ? _handleRemoveAccount
+                                  : _handleRecoverPassword,
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                  Observer(
-                    builder: (ctx) => RaisedButton(
-                      child: model.busy
-                          ? SizedBox(
-                              height: 15,
-                              child: const CircularProgressIndicator(
-                                  strokeWidth: 3),
-                            )
-                          : Text(
+                  RaisedButton(
+                    child: model.busy
+                        ? SizedBox(
+                            height: 15,
+                            child:
+                                const CircularProgressIndicator(strokeWidth: 3),
+                          )
+                        : Observer(
+                            builder: (ctx) => Text(
                               !_userStore.isAuthenticated ? 'Entrar' : 'Sair',
                             ),
-                      elevation: 2,
-                      color: Theme.of(context).primaryColor,
-                      textColor: Theme.of(context).primaryTextTheme.title.color,
-                      onPressed: _handleSignInAndOut,
-                    ),
+                          ),
+                    elevation: 2,
+                    color: Theme.of(context).primaryColor,
+                    textColor: Theme.of(context).primaryTextTheme.headline6.color,
+                    onPressed: _handleSignInAndOut,
                   ),
                 ],
               ),

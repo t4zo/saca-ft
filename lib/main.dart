@@ -7,7 +7,6 @@ import 'package:saca/stores/user.store.dart';
 import 'package:saca/stores/category.store.dart';
 
 import 'package:saca/navigations/tab.navigation.dart';
-import 'package:saca/views/Images/create.view.dart';
 
 class MyHttpOverrides extends HttpOverrides {
   @override
@@ -49,15 +48,14 @@ class _MyAppState extends State<MyApp> {
           fontFamily: 'Quicksand',
           appBarTheme: AppBarTheme(
             textTheme: ThemeData.light().textTheme.copyWith(
-                  title: TextStyle(fontFamily: 'OpenSans', fontSize: 20),
+                  headline6: TextStyle(fontFamily: 'OpenSans', fontSize: 20),
                 ),
           ),
         ),
         initialRoute: '/',
         routes: {
           '/': (ctx) => TabsScreen(),
-          CreateImage.routeName: (ctx) => CreateImage(),
-          // SignUpView.routeName: (ctx) => SignUpView(),
+          // CreateImage.routeName: (ctx) => CreateImage(),
         },
         onGenerateRoute: (settings) {
           // print(settings.arguments);

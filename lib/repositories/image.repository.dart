@@ -1,23 +1,23 @@
 import 'package:dio/dio.dart';
-import 'package:saca/models/category.model.dart';
+import 'package:saca/models/image.model.dart';
 import 'package:saca/models/user.model.dart';
 import 'package:saca/services/http.service.dart';
 
-class CategoryRepository {
+class ImageRepository {
   HttpService _httpService;
 
-  CategoryRepository() {
+  ImageRepository() {
     _httpService = HttpService();
-    _httpService.dio.options.baseUrl += '/categories';
+    _httpService.dio.options.baseUrl += '/images';
   }
 
-  Future<List<Category>> getAllHome() async {
+  Future<List<Image>> getAllHome() async {
     try {
       Response response = await _httpService.dio.get('');
 
       if (response.statusCode == 200) {
         var categories = (response.data as List)
-            .map((category) => Category.fromJson(category))
+            .map((image) => Image.fromJson(image))
             .toList();
 
         return categories;
@@ -30,7 +30,7 @@ class CategoryRepository {
     }
   }
 
-  Future<List<Category>> getAll(User user) async {
+  Future<List<Image>> getAll(User user) async {
     try {  
       _httpService.addToken(user.token);
       
@@ -38,7 +38,7 @@ class CategoryRepository {
 
       if (response.statusCode == 200) {
         var categories = (response.data as List)
-            .map((category) => Category.fromJson(category))
+            .map((image) => Image.fromJson(image))
             .toList();
 
         return categories;

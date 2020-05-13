@@ -140,7 +140,7 @@ class _SignUpScreenView extends State<SignUpView> {
                       child: Text('Registrar'),
                       elevation: 2,
                       color: Theme.of(context).primaryColor,
-                      textColor: Theme.of(context).primaryTextTheme.title.color,
+                      textColor: Theme.of(context).primaryTextTheme.headline6.color,
                       onPressed: () {
                         final result = _handleSignUp();
                         if (result) {

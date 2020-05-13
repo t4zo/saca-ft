@@ -9,13 +9,6 @@ part of 'category.store.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
 mixin _$CategoryStore on _CategoryStore, Store {
-  Computed<List<CategoryViewModel>> _$categoriesComputed;
-
-  @override
-  List<CategoryViewModel> get categories => (_$categoriesComputed ??=
-          Computed<List<CategoryViewModel>>(() => super.categories))
-      .value;
-
   final _$_categoriesAtom = Atom(name: '_CategoryStore._categories');
 
   @override
@@ -58,7 +51,7 @@ mixin _$CategoryStore on _CategoryStore, Store {
 
   @override
   String toString() {
-    final string = 'categories: ${categories.toString()}';
+    final string = '';
     return '{$string}';
   }
 }

@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 
-import '../settings.dart';
+import 'package:saca/settings.dart';
 
 class HttpService {
   Dio _dio;
@@ -8,11 +8,14 @@ class HttpService {
   HttpService() {
     _dio = Dio(BaseOptions(
       baseUrl: API_URL,
-      headers: {'Authorize': 'Bearer $token'},
     ));
   }
 
   Dio get dio {
     return _dio;
+  }
+
+  void addToken(String token) {
+    _dio.options.headers.putIfAbsent('Authorization', () => 'Bearer $token');
   }
 }

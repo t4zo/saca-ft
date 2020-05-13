@@ -7,11 +7,10 @@ class CategoryStore = _CategoryStore with _$CategoryStore;
 
 abstract class _CategoryStore with Store {
   @observable
-  List<CategoryViewModel> _categories;
+  List<CategoryViewModel> _categories = [];
 
-  @computed
   List<CategoryViewModel> get categories {
-    return _categories == null ? [] : [..._categories];
+    return [..._categories];
   }
 
   @action
@@ -22,9 +21,7 @@ abstract class _CategoryStore with Store {
   @action
   void toggleExpanded(int index, bool isExpanded) {
     List<CategoryViewModel> categories = List.from(_categories);
-    print(categories[index].isExpanded);
     categories[index].isExpanded = !isExpanded;
-    print(categories[index].isExpanded);
     _categories = categories;
   }
 }

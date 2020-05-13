@@ -21,11 +21,14 @@ dependencies:
     sdk: flutter
   
   dio: ^3.0.9
-  camera: ^0.5.7+4
   mobx: ^1.1.1
   flutter_mobx: ^1.1.0
   provider: ^4.0.5+1
   flutter_tts: ^1.1.0
+  image_picker: ^0.6.6+1
+  path_provider: ^1.6.4
+  path: ^1.6.4
+  flutter_keyboard_visibility: ^2.0.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

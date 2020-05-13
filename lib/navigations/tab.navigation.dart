@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
 import 'package:saca/views/home.view.dart';
+import 'package:saca/views/images.view.dart';
 import 'package:saca/views/signin.view.dart';
 import 'package:saca/views/signup.view.dart';
 import 'package:saca/stores/user.store.dart';
@@ -21,6 +22,7 @@ class _TabsScreenState extends State<TabsScreen> {
     setState(() {
       _screens = [
         {'screen': HomeView(), 'title': 'Categorias'},
+        {'screen': ImagesView(), 'title': 'Imagens'},
         {'screen': SignInView(), 'title': 'Entrar'},
         {'screen': SignUpView(), 'title': 'Registrar'},
       ];
@@ -52,8 +54,13 @@ class _TabsScreenState extends State<TabsScreen> {
           items: [
             BottomNavigationBarItem(
               backgroundColor: Theme.of(context).primaryColor,
-              icon: Icon(Icons.home),
+              icon: Icon(Icons.category),
               title: Text('Categorias'),
+            ),
+            BottomNavigationBarItem(
+              backgroundColor: Theme.of(context).primaryColor,
+              icon: Icon(Icons.image),
+              title: Text('Imagens'),
             ),
             BottomNavigationBarItem(
               backgroundColor: Theme.of(context).primaryColor,

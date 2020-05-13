@@ -7,8 +7,7 @@ import 'package:saca/settings.dart';
 
 import 'package:saca/stores/user.store.dart';
 import 'package:saca/stores/category.store.dart';
-
-import 'Images/create.view.dart';
+import 'package:saca/views/Images/create.view.dart';
 
 class HomeView extends StatefulWidget {
   static final routeName = '/home';
@@ -27,10 +26,20 @@ class _HomeViewState extends State<HomeView> {
     CategoriesController().getAllAsync(context);
   }
 
+  void _showBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      builder: (ctx) => CreateImage(),
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25.0))),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    var _userStore = Provider.of<UserStore>(context, listen: false);
-    var _categoryStore = Provider.of<CategoryStore>(context, listen: false);
+    final userStore = Provider.of<UserStore>(context, listen: false);
+    final categoryStore = Provider.of<CategoryStore>(context, listen: false);
 
     return Scaffold(
       body: Observer(builder: (_) {
@@ -38,14 +47,14 @@ class _HomeViewState extends State<HomeView> {
           child: RefreshIndicator(
             onRefresh: () => categoriesController.getAllAsync(context),
             child: SingleChildScrollView(
-              child: categoriesController.categories(context) == null
+              child: categoryStore.categories == null
                   ? Center(child: CircularProgressIndicator())
                   : ExpansionPanelList(
                       expansionCallback: (index, isExpanded) {
                         categoriesController.toggleExpanded(
                             context, index, isExpanded);
                       },
-                      children: _categoryStore.categories
+                      children: categoryStore.categories
                           .map<ExpansionPanel>(
                             (category) => ExpansionPanel(
                               headerBuilder: (context, isExpanded) {
@@ -85,34 +94,19 @@ class _HomeViewState extends State<HomeView> {
           ),
         );
       }),
-      floatingActionButton: _userStore.isAuthenticated
+      floatingActionButton: userStore.isAuthenticated
           ? FloatingActionButton(
-              onPressed: () =>
-                  Navigator.of(context).pushNamed(CreateImage.routeName),
+              tooltip: 'Adicionar Imagem',
+              onPressed: _showBottomSheet,
+              // Navigator.of(context).pushNamed(CreateImage.routeName),
               backgroundColor: Theme.of(context).primaryColor,
               child: Icon(
                 Icons.add,
-                color: Theme.of(context).primaryTextTheme.title.color,
+                color: Theme.of(context).primaryTextTheme.headline6.color,
               ),
             )
           : null,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 }
-// child: FutureBuilder(
-//   future: CategoryRepository.getAll(),
-//   builder: (ctx, snp) {
-//     if (snp.hasData) {
-//       return ListView.builder(
-//         itemCount: 1,
-//         itemBuilder: (ctx, i) => _buildPanel(snp.data, _userStore),
-//       );
-//     } else {
-//       return Container(
-//         child: Center(
-//           child: CircularProgressIndicator(),
-//         ),
-//       );
-//     }
-//   },
-// ),

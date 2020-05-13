@@ -11,7 +11,7 @@ class AuthController {
     _userRepository = UserRepository();
   }
 
-  void authenticate(SignInViewModel model, BuildContext context) async {
+  Future authenticate(SignInViewModel model, BuildContext context) async {
     final _userStore = Provider.of<UserStore>(context, listen: false);
     final user = await _userRepository.authenticateAsync(model);
     _userStore.setUser(user);

@@ -13,11 +13,6 @@ class CategoriesController {
     _categoryRepository = CategoryRepository();
   }
 
-  List<CategoryViewModel> categories(BuildContext context) {
-    final _categoryStore = Provider.of<CategoryStore>(context, listen: false);
-    return _categoryStore.categories;
-  }
-
   Future<void> getAllAsync(BuildContext context) async {
     final _userStore = Provider.of<UserStore>(context, listen: false);
     final _categoryStore = Provider.of<CategoryStore>(context, listen: false);
