@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -6,6 +7,10 @@ import 'package:image_picker/image_picker.dart';
 
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart' as syspaths;
+import 'package:provider/provider.dart';
+import 'package:saca/controllers/images.controller.dart';
+import 'package:saca/stores/user.store.dart';
+import 'package:saca/view-models/image.viewmodel.dart';
 
 class CreateImage extends StatefulWidget {
   static const routeName = '/images/create';
@@ -15,9 +20,16 @@ class CreateImage extends StatefulWidget {
 }
 
 class _CreateImageState extends State<CreateImage> {
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  final _form = GlobalKey<FormState>();
+
   File _image;
-  final _imageNameController = TextEditingController();
+  final _model = ImageViewModel();
+
   bool _keyboardVisible = false;
+
+  bool _loading = false;
 
   @override
   void initState() {
@@ -50,6 +62,39 @@ class _CreateImageState extends State<CreateImage> {
     });
   }
 
+  Future _handleSave() async {
+    final isValid = _form.currentState.validate();
+    if (!isValid) return;
+
+    if (_image == null) return;
+
+    _form.currentState.save();
+
+    final user = Provider.of<UserStore>(context, listen: false).user;
+
+    final imageBytes = await _image.readAsBytes();
+    setState(() {
+      _model.categoryId = 1;
+      _model.base64 = base64Encode(imageBytes);
+      _loading = true;
+    });
+
+    final result = await ImagesController().create(context, user, _model);
+
+    setState(() {
+      _loading = false;
+    });
+
+    if (result) {
+      Navigator.of(context).pop();
+    } else {
+      _scaffoldKey.currentState.showSnackBar(SnackBar(
+        content: Text('Erro ao enviar imagem'),
+        duration: Duration(seconds: 5),
+      ));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -61,7 +106,14 @@ class _CreateImageState extends State<CreateImage> {
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             const SizedBox(height: 10),
-            const Text('Aperte na imagem para capturá-la'),
+            Text(
+              'Aperte no quadrado para capturar a imagem',
+              style: TextStyle(
+                decoration: TextDecoration.underline,
+                decorationColor: _image == null ? Colors.red : Colors.green,
+                decorationThickness: 3,
+              ),
+            ),
             Expanded(
               child: Padding(
                 padding: EdgeInsets.only(
@@ -81,22 +133,33 @@ class _CreateImageState extends State<CreateImage> {
                                 color: Theme.of(context).primaryColor)),
                         alignment: Alignment.center,
                         child: _image == null
-                            ? Icon(Icons.camera_alt, color: Theme.of(context).primaryColor,)
+                            ? Icon(
+                                Icons.camera_alt,
+                                color: Theme.of(context).primaryColor,
+                              )
                             : Image.file(
                                 _image,
                                 fit: BoxFit.cover,
                               ),
                       ),
                     ),
-                    Container(
-                      width: MediaQuery.of(context).size.width * 0.5,
-                      child: TextField(
-                        controller: _imageNameController,
-                        autocorrect: false,
-                        autofocus: false,
-                        decoration: InputDecoration(
-                          labelText: 'Nome da Imagem',
-                          border: OutlineInputBorder(),
+                    Form(
+                      key: _form,
+                      child: Container(
+                        width: MediaQuery.of(context).size.width * 0.5,
+                        child: TextFormField(
+                          textInputAction: TextInputAction.done,
+                          autocorrect: false,
+                          autofocus: false,
+                          decoration: InputDecoration(
+                            labelText: 'Nome da Imagem',
+                            border: OutlineInputBorder(),
+                          ),
+                          validator: (value) {
+                            if (value.isEmpty) return 'Informe um nome';
+                            return null;
+                          },
+                          onSaved: (value) => _model.name = value,
                         ),
                       ),
                     ),
@@ -107,12 +170,20 @@ class _CreateImageState extends State<CreateImage> {
             Container(
               width: double.infinity,
               child: RaisedButton.icon(
-                icon: Icon(Icons.add),
-                label: const Text('Salvar'),
-                color: Theme.of(context).accentColor,
+                icon: Icon(Icons.add, color: Colors.white),
+                label: _loading
+                    ? SizedBox(
+                        height: 10,
+                        child: const CircularProgressIndicator(strokeWidth: 3),
+                      )
+                    : const Text(
+                        'Salvar',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                color: Theme.of(context).primaryColor,
                 elevation: 0,
                 materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                onPressed: _takePicture,
+                onPressed: _handleSave,
               ),
             )
           ],

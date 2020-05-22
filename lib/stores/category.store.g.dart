@@ -50,6 +50,16 @@ mixin _$CategoryStore on _CategoryStore, Store {
   }
 
   @override
+  void addImage(Image image) {
+    final _$actionInfo = _$_CategoryStoreActionController.startAction();
+    try {
+      return super.addImage(image);
+    } finally {
+      _$_CategoryStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     final string = '';
     return '{$string}';

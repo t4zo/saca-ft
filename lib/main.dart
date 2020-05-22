@@ -2,11 +2,14 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:saca/controllers/auth.controller.dart';
+import 'package:saca/stores/session.store.dart';
 
 import 'package:saca/stores/user.store.dart';
 import 'package:saca/stores/category.store.dart';
 
 import 'package:saca/navigations/tab.navigation.dart';
+import 'package:saca/views/splashscreen.view.dart';
 
 class MyHttpOverrides extends HttpOverrides {
   @override
@@ -23,49 +26,58 @@ void main() {
   runApp(MyApp());
 }
 
-class MyApp extends StatefulWidget {
-  @override
-  _MyAppState createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
+class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        Provider<CategoryStore>(create: (_) => CategoryStore()),
         Provider<UserStore>(create: (_) => UserStore()),
+        Provider<SessionStore>(create: (_) => SessionStore()),
+        Provider<CategoryStore>(create: (_) => CategoryStore()),
       ],
-      // return Provider<AppStore>(
-      // create: (_) => AppStore(),
-      child: MaterialApp(
-        title: 'SACA',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          primarySwatch: Colors.purple,
-          accentColor: Colors.amberAccent[200],
-          errorColor: Colors.red,
-          fontFamily: 'Quicksand',
-          appBarTheme: AppBarTheme(
-            textTheme: ThemeData.light().textTheme.copyWith(
-                  headline6: TextStyle(fontFamily: 'OpenSans', fontSize: 20),
-                ),
-          ),
+      child: Saca(),
+    );
+  }
+}
+
+class Saca extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final _authController = AuthController();
+
+    return MaterialApp(
+      title: 'SACA',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primarySwatch: Colors.purple,
+        accentColor: Colors.amberAccent[200],
+        errorColor: Colors.red,
+        fontFamily: 'Quicksand',
+        appBarTheme: AppBarTheme(
+          textTheme: ThemeData.light().textTheme.copyWith(
+                headline6: TextStyle(fontFamily: 'OpenSans', fontSize: 20),
+              ),
         ),
-        initialRoute: '/',
-        routes: {
-          '/': (ctx) => TabsScreen(),
-          // CreateImage.routeName: (ctx) => CreateImage(),
-        },
-        onGenerateRoute: (settings) {
-          // print(settings.arguments);
-          return MaterialPageRoute(
-            builder: (ctx) => TabsScreen(),
-          );
-        },
-        onUnknownRoute: (settings) => MaterialPageRoute(
+      ),
+      home: FutureBuilder(
+        future: _authController.tryAutoLogin(context),
+        builder: (ctx, snp) => snp.connectionState == ConnectionState.done
+            ? TabsScreen()
+            : SplashScreen(),
+      ),
+      // initialRoute: '/',
+      routes: {
+        // '/': (ctx) => TabsScreen(),
+        // CreateImage.routeName: (ctx) => CreateImage(),
+      },
+      onGenerateRoute: (settings) {
+        // print(settings.arguments);
+        return MaterialPageRoute(
           builder: (ctx) => TabsScreen(),
-        ),
+        );
+      },
+      onUnknownRoute: (settings) => MaterialPageRoute(
+        builder: (ctx) => TabsScreen(),
       ),
     );
   }

@@ -15,31 +15,36 @@ mixin _$UserStore on _UserStore, Store {
   dynamic get isAuthenticated => (_$isAuthenticatedComputed ??=
           Computed<dynamic>(() => super.isAuthenticated))
       .value;
-
-  final _$userAtom = Atom(name: '_UserStore.user');
+  Computed<dynamic> _$userComputed;
 
   @override
-  User get user {
-    _$userAtom.context.enforceReadPolicy(_$userAtom);
-    _$userAtom.reportObserved();
-    return super.user;
+  dynamic get user =>
+      (_$userComputed ??= Computed<dynamic>(() => super.user)).value;
+
+  final _$_userAtom = Atom(name: '_UserStore._user');
+
+  @override
+  User get _user {
+    _$_userAtom.context.enforceReadPolicy(_$_userAtom);
+    _$_userAtom.reportObserved();
+    return super._user;
   }
 
   @override
-  set user(User value) {
-    _$userAtom.context.conditionallyRunInAction(() {
-      super.user = value;
-      _$userAtom.reportChanged();
-    }, _$userAtom, name: '${_$userAtom.name}_set');
+  set _user(User value) {
+    _$_userAtom.context.conditionallyRunInAction(() {
+      super._user = value;
+      _$_userAtom.reportChanged();
+    }, _$_userAtom, name: '${_$_userAtom.name}_set');
   }
 
   final _$_UserStoreActionController = ActionController(name: '_UserStore');
 
   @override
-  void setUser(User _user) {
+  void setUser(User user) {
     final _$actionInfo = _$_UserStoreActionController.startAction();
     try {
-      return super.setUser(_user);
+      return super.setUser(user);
     } finally {
       _$_UserStoreActionController.endAction(_$actionInfo);
     }
@@ -48,7 +53,7 @@ mixin _$UserStore on _UserStore, Store {
   @override
   String toString() {
     final string =
-        'user: ${user.toString()},isAuthenticated: ${isAuthenticated.toString()}';
+        'isAuthenticated: ${isAuthenticated.toString()},user: ${user.toString()}';
     return '{$string}';
   }
 }

@@ -1,29 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
+import 'package:saca/controllers/images.controller.dart';
+import 'package:saca/models/image.model.dart' as Images;
 import 'package:saca/controllers/categories.controller.dart';
 import 'package:saca/services/tts.service.dart';
 import 'package:saca/settings.dart';
 
 import 'package:saca/stores/user.store.dart';
 import 'package:saca/stores/category.store.dart';
-import 'package:saca/views/Images/create.view.dart';
+import 'package:saca/widgets/create_image.modal.dart';
 
-class HomeView extends StatefulWidget {
-  static final routeName = '/home';
+class CategoriesView extends StatefulWidget {
+  static final routeName = '/categories';
 
   @override
-  _HomeViewState createState() => _HomeViewState();
+  _CategoriesViewState createState() => _CategoriesViewState();
 }
 
-class _HomeViewState extends State<HomeView> {
-  final ttsService = TtsService();
-  final categoriesController = CategoriesController();
+class _CategoriesViewState extends State<CategoriesView> {
+  final _ttsService = TtsService();
+  final _categoriesController = CategoriesController();
+  final _imagesController = ImagesController();
 
   @override
   void initState() {
     super.initState();
-    CategoriesController().getAllAsync(context);
+    CategoriesController()
+        .getAllAsync(context, Provider.of<UserStore>(context, listen: false));
   }
 
   void _showBottomSheet() {
@@ -32,29 +36,67 @@ class _HomeViewState extends State<HomeView> {
       builder: (ctx) => CreateImage(),
       isScrollControlled: true,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(25.0))),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(25.0))),
     );
+  }
+
+  Future _handleLongPress(Images.Image image) async {
+    if (image.categoryId != 1) return;
+
+    await showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+              title: const Text('Remover Imagem'),
+              content: Text('Tem certeza que deseja remover `${image.name}`?'),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text(
+                    'Voltar',
+                    style: TextStyle(
+                        color: Theme.of(context).textTheme.headline6.color),
+                  ),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+                FlatButton(
+                    child: const Text(
+                      'Remover',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                    onPressed: () {
+                      _imagesController.remove(
+                          context,
+                          Provider.of<UserStore>(context, listen: false).user,
+                          image);
+                      Navigator.of(context).pop();
+                    })
+              ],
+            ));
   }
 
   @override
   Widget build(BuildContext context) {
-    final userStore = Provider.of<UserStore>(context, listen: false);
-    final categoryStore = Provider.of<CategoryStore>(context, listen: false);
+    final _userStore = Provider.of<UserStore>(context, listen: false);
+    final _categoryStore = Provider.of<CategoryStore>(context, listen: false);
 
     return Scaffold(
-      body: Observer(builder: (_) {
-        return SafeArea(
+      body: Observer(
+        builder: (_) => SafeArea(
           child: RefreshIndicator(
-            onRefresh: () => categoriesController.getAllAsync(context),
+            onRefresh: () =>
+                _categoriesController.getAllAsync(context, _userStore),
             child: SingleChildScrollView(
-              child: categoryStore.categories == null
-                  ? Center(child: CircularProgressIndicator())
+              child: _categoryStore.categories.isEmpty
+                  ? Container(
+                      height: MediaQuery.of(context).size.height,
+                      child: Center(child: CircularProgressIndicator()),
+                    )
                   : ExpansionPanelList(
+                      expandedHeaderPadding: const EdgeInsets.all(0),
                       expansionCallback: (index, isExpanded) {
-                        categoriesController.toggleExpanded(
+                        _categoriesController.toggleExpanded(
                             context, index, isExpanded);
                       },
-                      children: categoryStore.categories
+                      children: _categoryStore.categories
                           .map<ExpansionPanel>(
                             (category) => ExpansionPanel(
                               headerBuilder: (context, isExpanded) {
@@ -74,7 +116,10 @@ class _HomeViewState extends State<HomeView> {
                                     padding: const EdgeInsets.symmetric(
                                         vertical: 16),
                                     child: GestureDetector(
-                                      onTap: () => ttsService.speak(image.name),
+                                      onLongPress: () =>
+                                          _handleLongPress(image),
+                                      onTap: () =>
+                                          _ttsService.speak(image.name),
                                       child: Column(
                                         children: <Widget>[
                                           Image.network(
@@ -92,9 +137,9 @@ class _HomeViewState extends State<HomeView> {
                     ),
             ),
           ),
-        );
-      }),
-      floatingActionButton: userStore.isAuthenticated
+        ),
+      ),
+      floatingActionButton: _userStore.isAuthenticated
           ? FloatingActionButton(
               tooltip: 'Adicionar Imagem',
               onPressed: _showBottomSheet,

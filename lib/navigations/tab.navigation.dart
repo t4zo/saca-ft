@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
-import 'package:saca/views/home.view.dart';
+import 'package:saca/views/categories.view.dart';
 import 'package:saca/views/images.view.dart';
 import 'package:saca/views/signin.view.dart';
 import 'package:saca/views/signup.view.dart';
@@ -21,7 +21,7 @@ class _TabsScreenState extends State<TabsScreen> {
     super.initState();
     setState(() {
       _screens = [
-        {'screen': HomeView(), 'title': 'Categorias'},
+        {'screen': CategoriesView(), 'title': 'Categorias'},
         {'screen': ImagesView(), 'title': 'Imagens'},
         {'screen': SignInView(), 'title': 'Entrar'},
         {'screen': SignUpView(), 'title': 'Registrar'},

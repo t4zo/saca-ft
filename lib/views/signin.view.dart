@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:saca/controllers/auth.controller.dart';
 import 'package:saca/stores/user.store.dart';
 import 'package:saca/view-models/signin.viewmodel.dart';
-import 'package:saca/views/home.view.dart';
+import 'package:saca/views/categories.view.dart';
 
 class SignInView extends StatefulWidget {
   static const routeName = '/signin';
@@ -62,10 +62,9 @@ class _SignInViewState extends State<SignInView> {
       model.busy = true;
     });
 
-    // Timer(Duration(seconds: 5), () {
     if (!_userStore.isAuthenticated) {
       await _signIn();
-      Navigator.pushNamed(context, HomeView.routeName);
+      Navigator.pushNamed(context, CategoriesView.routeName);
     } else {
       _signOut();
       _initialValues['password'] = '';
@@ -74,7 +73,6 @@ class _SignInViewState extends State<SignInView> {
     setState(() {
       model.busy = false;
     });
-    // });
   }
 
   void _handleRemoveAccount() {}

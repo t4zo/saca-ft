@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:provider/provider.dart';
+import 'package:saca/controllers/auth.controller.dart';
+import 'package:saca/stores/user.store.dart';
+import 'package:saca/view-models/signin.viewmodel.dart';
 import 'package:saca/view-models/signup.viewmodel.dart';
-import 'package:saca/views/home.view.dart';
+import 'package:saca/views/categories.view.dart';
 
 class SignUpView extends StatefulWidget {
   static const routeName = '/signup';
@@ -10,6 +15,8 @@ class SignUpView extends StatefulWidget {
 }
 
 class _SignUpScreenView extends State<SignUpView> {
+  final _authController = AuthController();
+
   final _form = GlobalKey<FormState>();
 
   final _emailFocusNode = FocusNode();
@@ -21,16 +28,27 @@ class _SignUpScreenView extends State<SignUpView> {
 
   var model = SignUpViewModel();
 
-  bool _handleSignUp() {
+  Future _handleSignUp() async {
     final isValid = _form.currentState.validate();
-    if (!isValid) return false;
+    if (!isValid) return;
 
     _form.currentState.save();
-    return true;
+    try {
+      final result = await _authController.signUp(model, context);
+      if (result)
+        await _authController.authenticate(
+            SignInViewModel(email: model.email, password: model.password),
+            context);
+    } catch (error) {
+      print(error);
+      return null;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final _userStore = Provider.of<UserStore>(context, listen: false);
+
     return Scaffold(
       body: SafeArea(
         child: GestureDetector(
@@ -136,17 +154,19 @@ class _SignUpScreenView extends State<SignUpView> {
                       ),
                     ),
                   ),
-                  RaisedButton(
-                      child: Text('Registrar'),
-                      elevation: 2,
-                      color: Theme.of(context).primaryColor,
-                      textColor: Theme.of(context).primaryTextTheme.headline6.color,
-                      onPressed: () {
-                        final result = _handleSignUp();
-                        if (result) {
-                          Navigator.pushNamed(context, HomeView.routeName);
-                        }
-                      }),
+                  Observer(
+                    builder: (ctx) => RaisedButton(
+                        child: Text('Registrar'),
+                        elevation: 2,
+                        color: Theme.of(context).primaryColor,
+                        textColor:
+                            Theme.of(context).primaryTextTheme.headline6.color,
+                        onPressed: () async {
+                          await _handleSignUp();
+                          if (_userStore.isAuthenticated)
+                            Navigator.pushNamed(context, CategoriesView.routeName);
+                        }),
+                  ),
                 ],
               ),
             ),

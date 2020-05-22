@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:saca/models/image.model.dart';
 import 'package:saca/models/user.model.dart';
 import 'package:saca/services/http.service.dart';
+import 'package:saca/view-models/image.viewmodel.dart';
 
 class ImageRepository {
   HttpService _httpService;
@@ -31,9 +34,9 @@ class ImageRepository {
   }
 
   Future<List<Image>> getAll(User user) async {
-    try {  
+    try {
       _httpService.addToken(user.token);
-      
+
       Response response = await _httpService.dio.get('/${user.id}');
 
       if (response.statusCode == 200) {
@@ -48,6 +51,45 @@ class ImageRepository {
     } catch (error) {
       print(error);
       return null;
+    }
+  }
+
+  Future<bool> create(User user, ImageViewModel image) async {
+    try {
+      final response = await _httpService.dio.post('/${user.id}',
+          data: image,
+          options: Options(contentType: ContentType.json.mimeType, headers: {
+            HttpHeaders.authorizationHeader: 'Bearer ${user.token}'
+          }));
+      if (response.statusCode == 200) {
+        return true;
+      }
+
+      return false;
+    } on DioError catch (error) {
+      if (error.response.statusCode == 302) {
+        return true;
+      }
+
+      return false;
+    }
+  }
+
+  Future<bool> remove(User user, Image image) async {
+    try {
+      final response = await _httpService.dio.delete('/${user.id}/${image.id}',
+          options: Options(contentType: ContentType.json.mimeType, headers: {
+            HttpHeaders.authorizationHeader: 'Bearer ${user.token}'
+          }));
+
+      if(response.statusCode == 200) {
+        return true;
+      }
+
+      return false;
+    } catch (error) {
+      print(error);
+      return false;
     }
   }
 }

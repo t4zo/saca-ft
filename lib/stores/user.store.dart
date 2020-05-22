@@ -7,13 +7,16 @@ class UserStore = _UserStore with _$UserStore;
 
 abstract class _UserStore with Store {
   @observable
-  User user;
+  User _user;
 
   @computed
-  get isAuthenticated => user != null;
+  get isAuthenticated => _user != null;
+
+  @computed
+  get user => _user;
 
   @action
-  void setUser(User _user) {
-    user = _user;
+  void setUser(User user) {
+    _user = user;
   }
 }
