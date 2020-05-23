@@ -30,10 +30,10 @@ class _CategoriesViewState extends State<CategoriesView> {
         .getAllAsync(context, Provider.of<UserStore>(context, listen: false));
   }
 
-  void _showBottomSheet() {
+  void _showBottomSheet([Images.Image image]) {
     showModalBottomSheet(
       context: context,
-      builder: (ctx) => CreateImage(),
+      builder: (ctx) => image != null ? CreateImage(image: image) : CreateImage(),
       isScrollControlled: true,
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(25.0))),
@@ -120,6 +120,7 @@ class _CategoriesViewState extends State<CategoriesView> {
                                           _handleLongPress(image),
                                       onTap: () =>
                                           _ttsService.speak(image.name),
+                                      onDoubleTap: () => _showBottomSheet(image),
                                       child: Column(
                                         children: <Widget>[
                                           Image.network(

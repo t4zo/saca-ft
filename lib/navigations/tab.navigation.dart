@@ -15,6 +15,10 @@ class TabsScreen extends StatefulWidget {
 class _TabsScreenState extends State<TabsScreen> {
   List<Map<String, dynamic>> _screens;
   int _selectScreenIndex = 0;
+  PageController _pageController = PageController(
+    initialPage: 0,
+    keepPage: true,
+  );
 
   @override
   void initState() {
@@ -31,7 +35,15 @@ class _TabsScreenState extends State<TabsScreen> {
 
   void _selectScreen(int index) {
     setState(() {
-      this._selectScreenIndex = index;
+      _selectScreenIndex = index;
+    });
+  }
+
+  void _bottomTapped(int index) {
+    setState(() {
+      _selectScreenIndex = index;
+      _pageController.animateToPage(index,
+          duration: Duration(milliseconds: 500), curve: Curves.easeOut);
     });
   }
 
@@ -43,12 +55,17 @@ class _TabsScreenState extends State<TabsScreen> {
       // appBar: AppBar(
       //   title: Text(_screens[_selectScreenIndex]['title']),
       // ),
-      body: _screens[_selectScreenIndex]['screen'],
+      body: PageView(
+        controller: _pageController,
+        onPageChanged: (index) => _selectScreen(index),
+        children: _screens.map((screen) => screen['screen'] as Widget).toList(),
+      ),
       bottomNavigationBar: Observer(
         builder: (_) => BottomNavigationBar(
           backgroundColor: Theme.of(context).primaryColor,
           selectedItemColor: Theme.of(context).accentColor,
           unselectedItemColor: Colors.white,
+          onTap: (index) => _bottomTapped(index),
           currentIndex: _selectScreenIndex,
           type: BottomNavigationBarType.fixed,
           items: [
@@ -76,7 +93,6 @@ class _TabsScreenState extends State<TabsScreen> {
                 title: Text('Registrar'),
               ),
           ],
-          onTap: _selectScreen,
         ),
       ),
     );

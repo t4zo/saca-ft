@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:image_picker/image_picker.dart';
@@ -9,11 +10,17 @@ import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart' as syspaths;
 import 'package:provider/provider.dart';
 import 'package:saca/controllers/images.controller.dart';
+import 'package:saca/settings.dart';
 import 'package:saca/stores/user.store.dart';
 import 'package:saca/view-models/image.viewmodel.dart';
+import 'package:saca/models/image.model.dart' as Images;
+import 'package:uuid/uuid.dart';
 
 class CreateImage extends StatefulWidget {
   static const routeName = '/images/create';
+  Images.Image image;
+
+  CreateImage({this.image});
 
   @override
   _CreateImageState createState() => _CreateImageState();
@@ -25,11 +32,14 @@ class _CreateImageState extends State<CreateImage> {
   final _form = GlobalKey<FormState>();
 
   File _image;
-  final _model = ImageViewModel();
 
   bool _keyboardVisible = false;
 
   bool _loading = false;
+
+  var _model =  ImageViewModel();
+
+  final _nameController = TextEditingController();
 
   @override
   void initState() {
@@ -37,6 +47,32 @@ class _CreateImageState extends State<CreateImage> {
     KeyboardVisibility.onChange.listen((visible) {
       _keyboardVisible = visible;
     });
+
+    if (widget.image != null) {
+      syspaths.getApplicationDocumentsDirectory().then((tempDir) {
+        final localDirectoryPath = '${tempDir.path}/tempDirectory';
+        final localImagePath = '$localDirectoryPath/image-${Uuid().v4()}.jpg';
+
+        final localDirectory = Directory(localDirectoryPath);
+        final localFile = File(localImagePath);
+
+        if (localDirectory.existsSync()) {
+          localDirectory.deleteSync(recursive: true);
+        }
+
+        localDirectory.createSync();
+
+        Dio()
+            .download('$CLOUDINARY_URL/${widget.image.url}', localImagePath)
+            .then((response) {
+          setState(() {
+            _nameController.text = widget.image.name;
+            _model.name = widget.image.name;
+            _image = localFile;
+          });
+        });
+      });
+    }
   }
 
   @override
@@ -148,6 +184,7 @@ class _CreateImageState extends State<CreateImage> {
                       child: Container(
                         width: MediaQuery.of(context).size.width * 0.5,
                         child: TextFormField(
+                          controller: _nameController,
                           textInputAction: TextInputAction.done,
                           autocorrect: false,
                           autofocus: false,

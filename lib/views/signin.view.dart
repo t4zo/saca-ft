@@ -151,12 +151,15 @@ class _SignInViewState extends State<SignInView> {
                             child: FlatButton(
                               padding: const EdgeInsets.only(left: 0),
                               child: Observer(
-                                builder: (ctx) => Text(
-                                  _userStore.isAuthenticated
-                                      ? 'Remover conta'
-                                      : 'Esqueceu a senha?',
-                                ),
-                              ),
+                                  builder: (ctx) => _userStore.isAuthenticated
+                                      ? Text(
+                                          'Remover conta',
+                                          style: TextStyle(
+                                            color: Colors.red,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        )
+                                      : Text('Esqueceu a senha?')),
                               onPressed: () => _userStore.isAuthenticated
                                   ? _handleRemoveAccount
                                   : _handleRecoverPassword,
@@ -180,7 +183,8 @@ class _SignInViewState extends State<SignInView> {
                           ),
                     elevation: 2,
                     color: Theme.of(context).primaryColor,
-                    textColor: Theme.of(context).primaryTextTheme.headline6.color,
+                    textColor:
+                        Theme.of(context).primaryTextTheme.headline6.color,
                     onPressed: _handleSignInAndOut,
                   ),
                 ],
