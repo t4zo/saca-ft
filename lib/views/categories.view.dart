@@ -9,7 +9,7 @@ import 'package:saca/settings.dart';
 
 import 'package:saca/stores/user.store.dart';
 import 'package:saca/stores/category.store.dart';
-import 'package:saca/widgets/create_image.modal.dart';
+import 'package:saca/widgets/create_update_image.modal.dart';
 
 class CategoriesView extends StatefulWidget {
   static final routeName = '/categories';
@@ -26,14 +26,17 @@ class _CategoriesViewState extends State<CategoriesView> {
   @override
   void initState() {
     super.initState();
-    CategoriesController()
-        .getAllAsync(context, Provider.of<UserStore>(context, listen: false));
+    CategoriesController().getAllAsync(
+      Provider.of<UserStore>(context, listen: false),
+      Provider.of<CategoryStore>(context, listen: false),
+    );
   }
 
   void _showBottomSheet([Images.Image image]) {
     showModalBottomSheet(
       context: context,
-      builder: (ctx) => image != null ? CreateImage(image: image) : CreateImage(),
+      builder: (ctx) =>
+          image != null ? CreateUpdateImage(image: image) : CreateUpdateImage(),
       isScrollControlled: true,
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(25.0))),
@@ -62,11 +65,11 @@ class _CategoriesViewState extends State<CategoriesView> {
                       'Remover',
                       style: TextStyle(color: Colors.red),
                     ),
-                    onPressed: () {
-                      _imagesController.remove(
-                          context,
-                          Provider.of<UserStore>(context, listen: false).user,
-                          image);
+                    onPressed: () async {
+                      await _imagesController.removeAsync(
+                        Provider.of<UserStore>(context, listen: false).user,
+                        image,
+                      );
                       Navigator.of(context).pop();
                     })
               ],
@@ -83,7 +86,7 @@ class _CategoriesViewState extends State<CategoriesView> {
         builder: (_) => SafeArea(
           child: RefreshIndicator(
             onRefresh: () =>
-                _categoriesController.getAllAsync(context, _userStore),
+                _categoriesController.getAllAsync(_userStore, _categoryStore),
             child: SingleChildScrollView(
               child: _categoryStore.categories.isEmpty
                   ? Container(
@@ -94,7 +97,7 @@ class _CategoriesViewState extends State<CategoriesView> {
                       expandedHeaderPadding: const EdgeInsets.all(0),
                       expansionCallback: (index, isExpanded) {
                         _categoriesController.toggleExpanded(
-                            context, index, isExpanded);
+                            _categoryStore, index, isExpanded);
                       },
                       children: _categoryStore.categories
                           .map<ExpansionPanel>(
@@ -120,7 +123,8 @@ class _CategoriesViewState extends State<CategoriesView> {
                                           _handleLongPress(image),
                                       onTap: () =>
                                           _ttsService.speak(image.name),
-                                      onDoubleTap: () => _showBottomSheet(image),
+                                      onDoubleTap: () =>
+                                          _showBottomSheet(image),
                                       child: Column(
                                         children: <Widget>[
                                           Image.network(
@@ -144,7 +148,6 @@ class _CategoriesViewState extends State<CategoriesView> {
           ? FloatingActionButton(
               tooltip: 'Adicionar Imagem',
               onPressed: _showBottomSheet,
-              // Navigator.of(context).pushNamed(CreateImage.routeName),
               backgroundColor: Theme.of(context).primaryColor,
               child: Icon(
                 Icons.add,

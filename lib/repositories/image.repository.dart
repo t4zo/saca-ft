@@ -54,10 +54,11 @@ class ImageRepository {
     }
   }
 
-  Future<bool> create(User user, ImageViewModel image) async {
+  Future<bool> create(User user, ImageViewModel imageViewModel) async {
     try {
+      imageViewModel.id = 0;
       final response = await _httpService.dio.post('/${user.id}',
-          data: image,
+          data: imageViewModel,
           options: Options(contentType: ContentType.json.mimeType, headers: {
             HttpHeaders.authorizationHeader: 'Bearer ${user.token}'
           }));
@@ -75,6 +76,25 @@ class ImageRepository {
     }
   }
 
+  Future<bool> update(User user, ImageViewModel imageViewModel) async {
+    try {
+      final response = await _httpService.dio.put('/${user.id}/${imageViewModel.id}',
+          data: imageViewModel,
+          options: Options(contentType: ContentType.json.mimeType, headers: {
+            HttpHeaders.authorizationHeader: 'Bearer ${user.token}'
+          }));
+
+      if (response.statusCode == 200) {
+        return true;
+      }
+
+      return false;
+    } catch (error) {
+      print(error);
+      return false;
+    }
+  }
+
   Future<bool> remove(User user, Image image) async {
     try {
       final response = await _httpService.dio.delete('/${user.id}/${image.id}',
@@ -82,7 +102,7 @@ class ImageRepository {
             HttpHeaders.authorizationHeader: 'Bearer ${user.token}'
           }));
 
-      if(response.statusCode == 200) {
+      if (response.statusCode == 200) {
         return true;
       }
 

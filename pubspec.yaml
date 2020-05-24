@@ -11,7 +11,7 @@ description: SACA project.
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.0.0+1
+version: 1.0.0+2
 
 environment:
   sdk: ">=2.3.0 <3.0.0"
@@ -41,7 +41,13 @@ dev_dependencies:
     sdk: flutter
   build_runner: ^1.9.0
   mobx_codegen: ^1.0.3
+  flutter_launcher_icons: ^0.7.5
 
+flutter_icons:
+  # android: "launcher_icon"
+  android: true
+  ios: true
+  image_path: "assets/images/logo.png"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

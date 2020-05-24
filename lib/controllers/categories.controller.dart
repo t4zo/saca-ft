@@ -1,5 +1,3 @@
-import 'package:flutter/widgets.dart';
-import 'package:provider/provider.dart';
 import 'package:saca/models/category.model.dart';
 import 'package:saca/repositories/category.repository.dart';
 import 'package:saca/stores/category.store.dart';
@@ -13,22 +11,20 @@ class CategoriesController {
     _categoryRepository = CategoryRepository();
   }
 
-  Future<void> getAllAsync(BuildContext context, UserStore _userStore) async {
-    final _categoryStore = Provider.of<CategoryStore>(context, listen: false);
+  Future<void> getAllAsync(UserStore userStore, CategoryStore categoryStore) async {
     List<Category> categories;
 
-    if (!_userStore.isAuthenticated) {
+    if (!userStore.isAuthenticated) {
       categories = await _categoryRepository.getAllHome();
     } else {
-      categories = await _categoryRepository.getAll(_userStore.user);
+      categories = await _categoryRepository.getAll(userStore.user);
     }
 
     final cvm = CategoryViewModel().fromCategoryList(categories);
-    _categoryStore.setCategories(cvm);
+    categoryStore.setCategories(cvm);
   }
 
-  void toggleExpanded(BuildContext context, int index, bool isExpanded) {
-    Provider.of<CategoryStore>(context, listen: false)
-        .toggleExpanded(index, isExpanded);
+  void toggleExpanded(CategoryStore categoryStore, int index, bool isExpanded) {
+    categoryStore.toggleExpanded(index, isExpanded);
   }
 }

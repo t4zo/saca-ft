@@ -4,6 +4,7 @@ import 'package:saca/controllers/images.controller.dart';
 import 'package:saca/models/image.model.dart' as Images;
 import 'package:saca/services/tts.service.dart';
 import 'package:saca/settings.dart';
+import 'package:saca/stores/category.store.dart';
 import 'package:saca/stores/user.store.dart';
 
 class ImagesView extends StatefulWidget {
@@ -20,7 +21,7 @@ class _ImagesViewState extends State<ImagesView> {
   void initState() {
     super.initState();
     setState(() {
-      _images = _imagesController.getAll(context);
+      _images = _imagesController.getAll(Provider.of<CategoryStore>(context, listen: false).categories);
     });
   }
 
@@ -46,11 +47,11 @@ class _ImagesViewState extends State<ImagesView> {
                       'Remover',
                       style: TextStyle(color: Colors.red),
                     ),
-                    onPressed: () {
-                      _imagesController.remove(
-                          context,
-                          Provider.of<UserStore>(context, listen: false).user,
-                          image);
+                    onPressed: () async {
+                      await _imagesController.removeAsync(
+                        Provider.of<UserStore>(context, listen: false).user,
+                        image,
+                      );
                       Navigator.of(context).pop();
                     })
               ],

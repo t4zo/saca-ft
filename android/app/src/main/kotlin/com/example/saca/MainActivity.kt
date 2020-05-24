@@ -1,4 +1,4 @@
-package com.example.saca
+package xyz.saca
 
 import androidx.annotation.NonNull;
 import io.flutter.embedding.android.FlutterActivity
