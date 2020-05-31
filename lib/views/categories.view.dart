@@ -23,15 +23,6 @@ class _CategoriesViewState extends State<CategoriesView> {
   final _categoriesController = CategoriesController();
   final _imagesController = ImagesController();
 
-  @override
-  void initState() {
-    super.initState();
-    CategoriesController().getAllAsync(
-      Provider.of<UserStore>(context, listen: false),
-      Provider.of<CategoryStore>(context, listen: false),
-    );
-  }
-
   void _showBottomSheet([Images.Image image]) {
     showModalBottomSheet(
       context: context,
@@ -67,6 +58,7 @@ class _CategoriesViewState extends State<CategoriesView> {
                     ),
                     onPressed: () async {
                       await _imagesController.removeAsync(
+                        Provider.of<CategoryStore>(context, listen: false),
                         Provider.of<UserStore>(context, listen: false).user,
                         image,
                       );
@@ -84,16 +76,22 @@ class _CategoriesViewState extends State<CategoriesView> {
     return Scaffold(
       body: Observer(
         builder: (_) => SafeArea(
-          child: RefreshIndicator(
-            onRefresh: () =>
+          child: FutureBuilder(
+            future:
                 _categoriesController.getAllAsync(_userStore, _categoryStore),
-            child: SingleChildScrollView(
-              child: _categoryStore.categories.isEmpty
-                  ? Container(
-                      height: MediaQuery.of(context).size.height,
-                      child: Center(child: CircularProgressIndicator()),
-                    )
-                  : ExpansionPanelList(
+            builder: (ctx, snp) {
+              if (snp.connectionState != ConnectionState.done) {
+                return Container(
+                  height: MediaQuery.of(context).size.height,
+                  child: Center(child: CircularProgressIndicator()),
+                );
+              }
+              return Observer(
+                builder: (_) => RefreshIndicator(
+                  onRefresh: () => _categoriesController.getAllAsync(
+                      _userStore, _categoryStore),
+                  child: SingleChildScrollView(
+                    child: ExpansionPanelList(
                       expandedHeaderPadding: const EdgeInsets.all(0),
                       expansionCallback: (index, isExpanded) {
                         _categoriesController.toggleExpanded(
@@ -102,11 +100,9 @@ class _CategoriesViewState extends State<CategoriesView> {
                       children: _categoryStore.categories
                           .map<ExpansionPanel>(
                             (category) => ExpansionPanel(
-                              headerBuilder: (context, isExpanded) {
-                                return ListTile(
-                                  title: Text(category.name),
-                                );
-                              },
+                              headerBuilder: (context, isExpanded) => ListTile(
+                                title: Text(category.name),
+                              ),
                               canTapOnHeader: true,
                               isExpanded: category.isExpanded,
                               body: Wrap(
@@ -140,7 +136,10 @@ class _CategoriesViewState extends State<CategoriesView> {
                           )
                           .toList(),
                     ),
-            ),
+                  ),
+                ),
+              );
+            },
           ),
         ),
       ),

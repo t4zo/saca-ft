@@ -1,6 +1,7 @@
 import 'package:saca/models/image.model.dart' as Images;
 import 'package:saca/models/user.model.dart';
 import 'package:saca/repositories/image.repository.dart';
+import 'package:saca/stores/category.store.dart';
 import 'package:saca/view-models/image.viewmodel.dart';
 
 class ImagesController {
@@ -22,15 +23,27 @@ class ImagesController {
     return images;
   }
 
-  Future<bool> createAsync(User user, ImageViewModel imageViewModel) async {
-    return await _imageRepository.create(user, imageViewModel);
+  Future<bool> createAsync(CategoryStore categoryStore, User user, ImageViewModel imageViewModel) async {
+    final _image = await _imageRepository.create(user, imageViewModel);
+    if(_image == null) return false;
+
+    categoryStore.addImage(_image);
+    return true;
   }
 
-  Future<bool> updateAsync(User user, ImageViewModel image) async {
-    return await _imageRepository.update(user, image);
+  Future<bool> updateAsync(CategoryStore categoryStore, User user, ImageViewModel image) async {
+    final _image = await _imageRepository.update(user, image);
+    if(_image == null) return false;
+
+    categoryStore.updateImage(_image);
+    return true;
   }
 
-  Future<bool> removeAsync(User user, Images.Image image) async {
-    return await _imageRepository.remove(user, image);
+  Future<bool> removeAsync(CategoryStore categoryStore, User user, Images.Image image) async {
+    final _image = await _imageRepository.remove(user, image);
+    if(_image == null) return false;
+
+    categoryStore.removeImage(_image);
+    return true;
   }
 }

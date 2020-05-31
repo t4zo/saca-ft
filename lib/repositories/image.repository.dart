@@ -27,8 +27,7 @@ class ImageRepository {
       }
 
       return null;
-    } catch (e) {
-      print(e);
+    } catch (error) {
       return null;
     }
   }
@@ -49,12 +48,11 @@ class ImageRepository {
 
       return null;
     } catch (error) {
-      print(error);
       return null;
     }
   }
 
-  Future<bool> create(User user, ImageViewModel imageViewModel) async {
+  Future<Image> create(User user, ImageViewModel imageViewModel) async {
     try {
       imageViewModel.id = 0;
       final response = await _httpService.dio.post('/${user.id}',
@@ -63,20 +61,20 @@ class ImageRepository {
             HttpHeaders.authorizationHeader: 'Bearer ${user.token}'
           }));
       if (response.statusCode == 200) {
-        return true;
+        return Image.fromJson(response.data);
       }
 
-      return false;
-    } on DioError catch (error) {
-      if (error.response.statusCode == 302) {
-        return true;
-      }
-
-      return false;
+      return null;
+    // } on DioError catch (error) {
+    //   if (error.response.statusCode == 302) {
+    //     return response.data;
+    //   }
+    } on DioError {
+      return null;
     }
   }
 
-  Future<bool> update(User user, ImageViewModel imageViewModel) async {
+  Future<Image> update(User user, ImageViewModel imageViewModel) async {
     try {
       final response = await _httpService.dio.put('/${user.id}/${imageViewModel.id}',
           data: imageViewModel,
@@ -85,17 +83,16 @@ class ImageRepository {
           }));
 
       if (response.statusCode == 200) {
-        return true;
+        return Image.fromJson(response.data);
       }
 
-      return false;
+      return null;
     } catch (error) {
-      print(error);
-      return false;
+      return null;
     }
   }
 
-  Future<bool> remove(User user, Image image) async {
+  Future<Image> remove(User user, Image image) async {
     try {
       final response = await _httpService.dio.delete('/${user.id}/${image.id}',
           options: Options(contentType: ContentType.json.mimeType, headers: {
@@ -103,13 +100,12 @@ class ImageRepository {
           }));
 
       if (response.statusCode == 200) {
-        return true;
+        return Image.fromJson(response.data);
       }
 
-      return false;
+      return null;
     } catch (error) {
-      print(error);
-      return false;
+      return null;
     }
   }
 }

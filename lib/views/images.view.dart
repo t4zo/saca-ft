@@ -49,6 +49,7 @@ class _ImagesViewState extends State<ImagesView> {
                     ),
                     onPressed: () async {
                       await _imagesController.removeAsync(
+                        Provider.of<CategoryStore>(context, listen: false),
                         Provider.of<UserStore>(context, listen: false).user,
                         image,
                       );

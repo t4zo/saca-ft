@@ -11,6 +11,7 @@ import 'package:path_provider/path_provider.dart' as syspaths;
 import 'package:provider/provider.dart';
 import 'package:saca/controllers/images.controller.dart';
 import 'package:saca/settings.dart';
+import 'package:saca/stores/category.store.dart';
 import 'package:saca/stores/user.store.dart';
 import 'package:saca/view-models/image.viewmodel.dart';
 import 'package:saca/models/image.model.dart' as Images;
@@ -29,20 +30,16 @@ class CreateUpdateImage extends StatefulWidget {
 
 class _CreateUpdateImageState extends State<CreateUpdateImage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
-
   final _form = GlobalKey<FormState>();
 
+  final _nameController = TextEditingController();
   File _image;
 
   bool _keyboardVisible = false;
-
   bool _loading = false;
+  bool _isUpdate = false;
 
   var _model = ImageViewModel();
-
-  final _nameController = TextEditingController();
-
-  bool _isUpdate = false;
 
   @override
   void initState() {
@@ -107,6 +104,7 @@ class _CreateUpdateImageState extends State<CreateUpdateImage> {
 
     final imagesController = ImagesController();
     final user = Provider.of<UserStore>(context, listen: false).user;
+    final categoryStore = Provider.of<CategoryStore>(context, listen: false);
 
     final imageBytes = await _image.readAsBytes();
     setState(() {
@@ -118,6 +116,7 @@ class _CreateUpdateImageState extends State<CreateUpdateImage> {
     bool result;
     if (_isUpdate) {
       result = await imagesController.updateAsync(
+          categoryStore,
           user,
           ImageViewModel(
             id: widget.image.id,
@@ -126,7 +125,7 @@ class _CreateUpdateImageState extends State<CreateUpdateImage> {
             base64: _model.base64,
           ));
     } else {
-      result = await imagesController.createAsync(user, _model);
+      result = await imagesController.createAsync(categoryStore, user, _model);
     }
 
     setState(() {
@@ -218,21 +217,24 @@ class _CreateUpdateImageState extends State<CreateUpdateImage> {
             ),
             Container(
               width: double.infinity,
-              child: RaisedButton.icon(
-                icon: Icon(Icons.add, color: Colors.white),
-                label: _loading
-                    ? SizedBox(
-                        height: 10,
-                        child: const CircularProgressIndicator(strokeWidth: 3),
-                      )
-                    : const Text(
-                        'Salvar',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                color: Theme.of(context).primaryColor,
-                elevation: 0,
-                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                onPressed: _handleSaveOrUpdate,
+              child: SizedBox(
+                height: 40,
+                child: RaisedButton(
+                  child: _loading
+                      ? SizedBox(
+                          height: 10,
+                          child:
+                              const CircularProgressIndicator(strokeWidth: 3),
+                        )
+                      : Text(
+                          _isUpdate ? 'Atualizar' : 'Salvar',
+                          style: TextStyle(color: Colors.white, fontSize: 16),
+                        ),
+                  color: Theme.of(context).primaryColor,
+                  elevation: 0,
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  onPressed: _handleSaveOrUpdate,
+                ),
               ),
             )
           ],

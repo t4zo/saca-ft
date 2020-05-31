@@ -60,6 +60,26 @@ mixin _$CategoryStore on _CategoryStore, Store {
   }
 
   @override
+  void updateImage(Image image) {
+    final _$actionInfo = _$_CategoryStoreActionController.startAction();
+    try {
+      return super.updateImage(image);
+    } finally {
+      _$_CategoryStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void removeImage(Image image) {
+    final _$actionInfo = _$_CategoryStoreActionController.startAction();
+    try {
+      return super.removeImage(image);
+    } finally {
+      _$_CategoryStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     final string = '';
     return '{$string}';
