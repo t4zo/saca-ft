@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
 import 'package:saca/controllers/auth.controller.dart';
+import 'package:saca/stores/session.store.dart';
 import 'package:saca/stores/user.store.dart';
 import 'package:saca/view-models/signin.viewmodel.dart';
 import 'package:saca/views/categories.view.dart';
@@ -18,7 +19,7 @@ class _SignInViewState extends State<SignInView> {
 
   final _passwordFocusNode = FocusNode();
 
-  var model = SignInViewModel(busy: false);
+  var signInViewModel = SignInViewModel(busy: false);
 
   var _initialValues = {'email': '', 'password': ''};
 
@@ -48,18 +49,23 @@ class _SignInViewState extends State<SignInView> {
 
     _form.currentState.save();
 
-    await AuthController().authenticate(model, context);
+    final userStore = Provider.of<UserStore>(context, listen: false);
+    final sessionStore = Provider.of<SessionStore>(context, listen: false);
+
+    AuthController().authenticate(signInViewModel, userStore, sessionStore);
   }
 
   void _signOut() {
-    AuthController().signOut(context);
+    final userStore = Provider.of<UserStore>(context, listen: false);
+    final sessionStore = Provider.of<SessionStore>(context, listen: false);
+    AuthController().signOut(userStore, sessionStore);
   }
 
-  Future _handleSignInAndOut() async {
+  Future _handleSignInAndSignOut() async {
     final _userStore = Provider.of<UserStore>(context, listen: false);
 
     setState(() {
-      model.busy = true;
+      signInViewModel.busy = true;
     });
 
     if (!_userStore.isAuthenticated) {
@@ -71,7 +77,7 @@ class _SignInViewState extends State<SignInView> {
     }
 
     setState(() {
-      model.busy = false;
+      signInViewModel.busy = false;
     });
   }
 
@@ -123,7 +129,7 @@ class _SignInViewState extends State<SignInView> {
                                 return 'Por favor, informe seu email';
                               return null;
                             },
-                            onSaved: (value) => model.email = value,
+                            onSaved: (value) => signInViewModel.email = value,
                           ),
                           SizedBox(
                             height: 20,
@@ -141,7 +147,7 @@ class _SignInViewState extends State<SignInView> {
                                 return 'Por favor, informe sua senha';
                               return null;
                             },
-                            onSaved: (value) => model.password = value,
+                            onSaved: (value) => signInViewModel.password = value,
                           ),
                           SizedBox(
                             height: 10,
@@ -170,7 +176,7 @@ class _SignInViewState extends State<SignInView> {
                     ),
                   ),
                   RaisedButton(
-                    child: model.busy
+                    child: signInViewModel.busy
                         ? SizedBox(
                             height: 15,
                             child:
@@ -185,7 +191,7 @@ class _SignInViewState extends State<SignInView> {
                     color: Theme.of(context).primaryColor,
                     textColor:
                         Theme.of(context).primaryTextTheme.headline6.color,
-                    onPressed: _handleSignInAndOut,
+                    onPressed: _handleSignInAndSignOut,
                   ),
                 ],
               ),

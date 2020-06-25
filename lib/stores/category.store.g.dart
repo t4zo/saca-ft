@@ -50,6 +50,16 @@ mixin _$CategoryStore on _CategoryStore, Store {
   }
 
   @override
+  void collapseAllExpanded() {
+    final _$actionInfo = _$_CategoryStoreActionController.startAction();
+    try {
+      return super.collapseAllExpanded();
+    } finally {
+      _$_CategoryStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   void addImage(Image image) {
     final _$actionInfo = _$_CategoryStoreActionController.startAction();
     try {

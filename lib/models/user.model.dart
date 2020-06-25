@@ -28,4 +28,9 @@ class User {
     data['token'] = this.token;
     return data;
   }
+
+  @override
+  String toString() {
+    return this.email;
+  }
 }

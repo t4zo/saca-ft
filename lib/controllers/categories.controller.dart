@@ -11,7 +11,7 @@ class CategoriesController {
     _categoryRepository = CategoryRepository();
   }
 
-  Future<void> getAllAsync(UserStore userStore, CategoryStore categoryStore) async {
+  Future getAllAsync(UserStore userStore, CategoryStore categoryStore) async {
     List<Category> categories;
 
     if (!userStore.isAuthenticated) {

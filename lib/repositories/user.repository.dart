@@ -28,7 +28,7 @@ class UserRepository {
     return null;
   }
 
-  Future signUp(SignUpViewModel model) async {
+  Future<bool> signUp(SignUpViewModel model) async {
     model.roles = ['usuario'];
 
     Response response = await _httpService.dio.post('/auth', data: {
@@ -40,7 +40,7 @@ class UserRepository {
     });
 
     if (response.statusCode == 200) {
-      return true;
+      return Future.value(true);
     }
 
     return null;

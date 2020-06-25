@@ -4,6 +4,7 @@ class Image {
   int userId = 0;
   String name = '';
   String url = '';
+  String fullyQualifiedPublicUrl = '';
 
   Image({
     this.id,
@@ -11,6 +12,7 @@ class Image {
     this.userId,
     this.name,
     this.url,
+    this.fullyQualifiedPublicUrl,
   });
 
   Image.fromJson(Map<String, dynamic> json) {
@@ -19,6 +21,7 @@ class Image {
     userId = json['userId'];
     name = json['name'];
     url = json['url'];
+    fullyQualifiedPublicUrl = json['fullyQualifiedPublicUrl'];
   }
 
   Map<String, dynamic> toJson() {
@@ -28,6 +31,12 @@ class Image {
     data['userId'] = this.userId;
     data['name'] = this.name;
     data['url'] = this.url;
+    data['fullyQualifiedPublicUrl'] = this.fullyQualifiedPublicUrl;
     return data;
+  }
+
+  @override
+  String toString() {
+    return this.name;
   }
 }

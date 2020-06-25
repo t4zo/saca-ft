@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
 import 'package:saca/controllers/auth.controller.dart';
+import 'package:saca/stores/session.store.dart';
 import 'package:saca/stores/user.store.dart';
 import 'package:saca/view-models/signin.viewmodel.dart';
 import 'package:saca/view-models/signup.viewmodel.dart';
@@ -26,7 +27,7 @@ class _SignUpScreenView extends State<SignUpView> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
-  var model = SignUpViewModel();
+  var signUpViewModel = SignUpViewModel();
 
   Future _handleSignUp() async {
     final isValid = _form.currentState.validate();
@@ -34,11 +35,14 @@ class _SignUpScreenView extends State<SignUpView> {
 
     _form.currentState.save();
     try {
-      final result = await _authController.signUp(model, context);
+      final result = await _authController.signUp(signUpViewModel);
       if (result)
-        await _authController.authenticate(
-            SignInViewModel(email: model.email, password: model.password),
-            context);
+        _authController.authenticate(
+          SignInViewModel(
+              email: signUpViewModel.email, password: signUpViewModel.password),
+          Provider.of<UserStore>(context, listen: false),
+          Provider.of<SessionStore>(context, listen: false),
+        );
     } catch (error) {
       print(error);
       return null;
@@ -47,7 +51,7 @@ class _SignUpScreenView extends State<SignUpView> {
 
   @override
   Widget build(BuildContext context) {
-    final _userStore = Provider.of<UserStore>(context, listen: false);
+    final userStore = Provider.of<UserStore>(context, listen: false);
 
     return Scaffold(
       body: SafeArea(
@@ -86,7 +90,8 @@ class _SignUpScreenView extends State<SignUpView> {
                                 return 'Por favor, informe seu usuário';
                               return null;
                             },
-                            onSaved: (value) => model.username = value,
+                            onSaved: (value) =>
+                                signUpViewModel.username = value,
                           ),
                           SizedBox(
                             height: 10,
@@ -103,7 +108,7 @@ class _SignUpScreenView extends State<SignUpView> {
                                 return 'Por favor, informe seu email';
                               return null;
                             },
-                            onSaved: (value) => model.email = value,
+                            onSaved: (value) => signUpViewModel.email = value,
                           ),
                           SizedBox(
                             height: 10,
@@ -129,7 +134,8 @@ class _SignUpScreenView extends State<SignUpView> {
                                 return 'Senhas não conferem';
                               return null;
                             },
-                            onSaved: (value) => model.password = value,
+                            onSaved: (value) =>
+                                signUpViewModel.password = value,
                           ),
                           SizedBox(
                             height: 10,
@@ -148,7 +154,8 @@ class _SignUpScreenView extends State<SignUpView> {
                                 return 'Senhas não conferem';
                               return null;
                             },
-                            onSaved: (value) => model.confirmPassword = value,
+                            onSaved: (value) =>
+                                signUpViewModel.confirmPassword = value,
                           ),
                         ],
                       ),
@@ -163,8 +170,9 @@ class _SignUpScreenView extends State<SignUpView> {
                             Theme.of(context).primaryTextTheme.headline6.color,
                         onPressed: () async {
                           await _handleSignUp();
-                          if (_userStore.isAuthenticated)
-                            Navigator.pushNamed(context, CategoriesView.routeName);
+                          if (userStore.isAuthenticated)
+                            Navigator.pushNamed(
+                                context, CategoriesView.routeName);
                         }),
                   ),
                 ],

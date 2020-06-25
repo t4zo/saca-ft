@@ -14,29 +14,27 @@ class AuthController {
   }
 
   Future<bool> tryAutoLogin(BuildContext context) async {
-    final user = await Provider.of<SessionStore>(context, listen: false).tryAutoLogin();
-    if (user != null) {
-      Provider.of<UserStore>(context, listen: false).setUser(user);
-      return Future.value(true);
-    }
+    final user =
+        await Provider.of<SessionStore>(context, listen: false).tryAutoLogin();
+    if (user == null) return Future.value(false);
 
-    return Future.value(false);
+    Provider.of<UserStore>(context, listen: false).setUser(user);
+    return Future.value(true);
   }
 
-  Future authenticate(SignInViewModel model, BuildContext context) async {
-    final _userStore = Provider.of<UserStore>(context, listen: false);
-    final _sessionStore = Provider.of<SessionStore>(context, listen: false);
-    final user = await _userRepository.authenticateAsync(model);
-    _sessionStore.setSession(user);
-    _userStore.setUser(user);
+  void authenticate(SignInViewModel signInViewModel, UserStore userStore,
+      SessionStore sessionStore) async {
+    final user = await _userRepository.authenticateAsync(signInViewModel);
+    sessionStore.setSession(user);
+    userStore.setUser(user);
   }
 
-  Future signUp(SignUpViewModel model, BuildContext context) async {
-    return _userRepository.signUp(model);
+  Future<bool> signUp(SignUpViewModel model) async {
+    return await _userRepository.signUp(model);
   }
 
-  Future signOut(BuildContext context) async {
-    Provider.of<UserStore>(context, listen: false).setUser(null);
-    await Provider.of<SessionStore>(context, listen: false).logout();
+  void signOut(UserStore userStore, SessionStore sessionStore) async {
+    userStore.setUser(null);
+    await sessionStore.logout();
   }
 }

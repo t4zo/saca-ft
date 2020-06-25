@@ -39,4 +39,9 @@ class Category {
     data['id'] = this.id;
     return data;
   }
+
+  @override
+  String toString() {
+    return this.name;
+  }
 }

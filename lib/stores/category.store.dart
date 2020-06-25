@@ -25,6 +25,14 @@ abstract class _CategoryStore with Store {
   }
 
   @action
+  void collapseAllExpanded() {
+    categories.forEach((category) {
+      category.isExpanded = false;
+    });
+    _categories = categories;
+  }
+
+  @action
   void addImage(Image image) {
     final category =
         _categories.firstWhere((category) => category.id == image.categoryId);

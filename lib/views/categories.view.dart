@@ -23,8 +23,8 @@ class _CategoriesViewState extends State<CategoriesView> {
   final _categoriesController = CategoriesController();
   final _imagesController = ImagesController();
 
-  void _showBottomSheet([Images.Image image]) {
-    showModalBottomSheet(
+  void _showBottomSheet([Images.Image image]) async {
+    await showModalBottomSheet(
       context: context,
       builder: (ctx) =>
           image != null ? CreateUpdateImage(image: image) : CreateUpdateImage(),
@@ -32,6 +32,8 @@ class _CategoriesViewState extends State<CategoriesView> {
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(25.0))),
     );
+
+    Provider.of<CategoryStore>(context, listen: false).collapseAllExpanded();
   }
 
   Future _handleLongPress(Images.Image image) async {
@@ -71,11 +73,11 @@ class _CategoriesViewState extends State<CategoriesView> {
   @override
   Widget build(BuildContext context) {
     final _userStore = Provider.of<UserStore>(context, listen: false);
-    final _categoryStore = Provider.of<CategoryStore>(context, listen: false);
+    final _categoryStore = Provider.of<CategoryStore>(context);
 
-    return Scaffold(
-      body: Observer(
-        builder: (_) => SafeArea(
+    return Observer(
+      builder: (_) => Scaffold(
+        body: SafeArea(
           child: FutureBuilder(
             future:
                 _categoriesController.getAllAsync(_userStore, _categoryStore),
@@ -124,7 +126,7 @@ class _CategoriesViewState extends State<CategoriesView> {
                                       child: Column(
                                         children: <Widget>[
                                           Image.network(
-                                              '$CLOUDINARY_URL/${image.url}'),
+                                              '$CLOUDINARY_URL/${image.fullyQualifiedPublicUrl}'),
                                           Text('${image.name}')
                                         ],
                                       ),
@@ -142,19 +144,19 @@ class _CategoriesViewState extends State<CategoriesView> {
             },
           ),
         ),
+        floatingActionButton: _userStore.isAuthenticated
+            ? FloatingActionButton(
+                tooltip: 'Adicionar Imagem',
+                onPressed: _showBottomSheet,
+                backgroundColor: Theme.of(context).primaryColor,
+                child: Icon(
+                  Icons.add,
+                  color: Theme.of(context).primaryTextTheme.headline6.color,
+                ),
+              )
+            : null,
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       ),
-      floatingActionButton: _userStore.isAuthenticated
-          ? FloatingActionButton(
-              tooltip: 'Adicionar Imagem',
-              onPressed: _showBottomSheet,
-              backgroundColor: Theme.of(context).primaryColor,
-              child: Icon(
-                Icons.add,
-                color: Theme.of(context).primaryTextTheme.headline6.color,
-              ),
-            )
-          : null,
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 }

@@ -31,7 +31,6 @@ class CreateUpdateImage extends StatefulWidget {
 class _CreateUpdateImageState extends State<CreateUpdateImage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   final _form = GlobalKey<FormState>();
-
   final _nameController = TextEditingController();
   File _image;
 
@@ -49,41 +48,58 @@ class _CreateUpdateImageState extends State<CreateUpdateImage> {
     });
 
     if (widget.image != null) {
-      syspaths.getApplicationDocumentsDirectory().then((tempDir) {
-        final localDirectoryPath = '${tempDir.path}/tempDirectory';
-        final localImagePath = '$localDirectoryPath/${Uuid().v4()}.jpg';
+      _handleInitialFileConfiguration();
+    }
+  }
 
-        final localDirectory = Directory(localDirectoryPath);
-        final localFile = File(localImagePath);
+  void _handleInitialFileConfiguration() async {
+    final tempDir = await syspaths.getTemporaryDirectory();
+    final localDirectoryPath = '${tempDir.path}/tempDirectory';
+    final localImagePath = '$localDirectoryPath/${Uuid().v4()}.jpg';
 
-        if (localDirectory.existsSync()) {
-          localDirectory.deleteSync(recursive: true);
-        }
+    resetDirectory(localDirectoryPath);
+    downloadFile(localImagePath);
+  }
 
-        localDirectory.createSync();
+  void downloadFile(String localImagePath) async {
+    final localFile = File(localImagePath);
 
-        Dio()
-            .download('$CLOUDINARY_URL/${widget.image.url}', localImagePath)
-            .then((response) {
-          setState(() {
-            _isUpdate = true;
-            _nameController.text = widget.image.name;
-            _model.name = widget.image.name;
-            _image = localFile;
-          });
-        });
-      });
+    final response = await Dio()
+        .download('$CLOUDINARY_URL/${widget.image.url}', localImagePath);
+
+    if (response.statusCode != 200) return;
+
+    setState(() {
+      _isUpdate = true;
+      _nameController.text = widget.image.name;
+      _model.name = widget.image.name;
+      _image = localFile;
+    });
+  }
+
+  void resetDirectory(localDirectoryPath) {
+    final localDirectory = Directory(localDirectoryPath);
+    if (localDirectory.existsSync()) {
+      localDirectory.deleteSync(recursive: true);
+    }
+    localDirectory.createSync();
+  }
+
+  Future _handlePicture() async {
+    var image = await _takePicture();
+    if (image != null) {
+      await _saveLocalPicture(image);
     }
   }
 
   Future _takePicture() async {
-    final image = await ImagePicker.pickImage(
+    return await ImagePicker.pickImage(
       source: ImageSource.camera,
       maxHeight: 200,
     );
+  }
 
-    if (image == null) return Future.value();
-
+  Future _saveLocalPicture(File image) async {
     final appDir = await syspaths.getApplicationDocumentsDirectory();
     final fileName = path.basename(image.path);
 
@@ -107,6 +123,7 @@ class _CreateUpdateImageState extends State<CreateUpdateImage> {
     final categoryStore = Provider.of<CategoryStore>(context, listen: false);
 
     final imageBytes = await _image.readAsBytes();
+
     setState(() {
       _model.categoryId = 1;
       _model.base64 = base64Encode(imageBytes);
@@ -145,7 +162,10 @@ class _CreateUpdateImageState extends State<CreateUpdateImage> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
+      onTap: () {
+        print('clickou');
+        FocusScope.of(context).requestFocus(FocusNode());
+      },
       child: Container(
         height:
             MediaQuery.of(context).size.height * (_keyboardVisible ? 0.7 : 0.3),
@@ -170,7 +190,7 @@ class _CreateUpdateImageState extends State<CreateUpdateImage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
                     GestureDetector(
-                      onTap: _takePicture,
+                      onTap: _handlePicture,
                       child: Container(
                         height: 100,
                         width: 100,
