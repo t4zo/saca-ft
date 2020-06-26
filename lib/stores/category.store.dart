@@ -19,59 +19,51 @@ abstract class _CategoryStore with Store {
 
   @action
   void toggleExpanded(int index, bool isExpanded) {
-    List<CategoryViewModel> categories = List.from(_categories);
-    categories[index].isExpanded = !isExpanded;
-    _categories = categories;
-  }
-
-  @action
-  void collapseAllExpanded() {
-    categories.forEach((category) {
-      category.isExpanded = false;
-    });
-    _categories = categories;
+    List<CategoryViewModel> newCategories = categories;
+    newCategories[index].isExpanded = !isExpanded;
+    _categories = newCategories;
   }
 
   @action
   void addImage(Image image) {
-    final category =
-        _categories.firstWhere((category) => category.id == image.categoryId);
+    final newCategories = categories;
+    final category = newCategories.firstWhere((category) => category.id == image.categoryId);
     
-    final index = _categories.indexOf(category);
+    final index = newCategories.indexOf(category);
     if(index == -1) return;
     
-    _categories[index].images.add(image);
+    newCategories[index].images.add(image);
+    _categories = newCategories;
   }
 
   @action
   void updateImage(Image image) {
-    final category =
-        _categories.firstWhere((category) => category.id == image.categoryId);
+    final newCategories = categories;
+    final category = newCategories.firstWhere((category) => category.id == image.categoryId);
     
-    final categoryIndex = _categories.indexOf(category);
+    final categoryIndex = newCategories.indexOf(category);
     if(categoryIndex == -1) return;
 
-    final _image = _categories[categoryIndex].images.firstWhere((i) => i.id == image.id);
+    final _image = newCategories[categoryIndex].images.firstWhere((i) => i.id == image.id);
 
     if(_image == null) return;
 
-    final imageIndex = _categories[categoryIndex].images.indexOf(_image);
+    final imageIndex = newCategories[categoryIndex].images.indexOf(_image);
 
-    _categories[categoryIndex].images[imageIndex] = image;
+    newCategories[categoryIndex].images[imageIndex] = image;
+
+    _categories = newCategories;
   }
 
   @action
   void removeImage(Image image) {
-    List<CategoryViewModel> categories = List.from(_categories);
+    final newCategories = categories;
+    final category = newCategories.firstWhere((category) => category.id == image.categoryId);
 
-    final category =
-        categories.firstWhere((category) => category.id == image.categoryId);
-
-    final index = _categories.indexOf(category);
+    final index = newCategories.indexOf(category);
     if(index == -1) return;
 
-    categories[index].images.remove(image);
-
-    _categories = categories;
+    newCategories[index].images.removeWhere((i) => i.id == image.id);
+    _categories = newCategories;
   }
 }

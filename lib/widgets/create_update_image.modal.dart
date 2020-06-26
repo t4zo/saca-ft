@@ -86,15 +86,42 @@ class _CreateUpdateImageState extends State<CreateUpdateImage> {
   }
 
   Future _handlePicture() async {
-    var image = await _takePicture();
+    final imageSource = await _chooseCaptureMethod();
+    final image = await _takePicture(imageSource);
     if (image != null) {
       await _saveLocalPicture(image);
     }
   }
 
-  Future _takePicture() async {
+  Future<ImageSource> _chooseCaptureMethod() async {
+    return await showDialog<ImageSource>(
+        context: context,
+        builder: (_) {
+          return SimpleDialog(
+            title: Text('Escolha o modo',
+                style: TextStyle(
+                    fontSize: Theme.of(context).textTheme.headline6.fontSize)),
+            children: <Widget>[
+              SimpleDialogOption(
+                child: const Text('Galeria', style: TextStyle(fontSize: 16)),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 20, horizontal: 25),
+                onPressed: () => Navigator.of(context).pop(ImageSource.gallery),
+              ),
+              SimpleDialogOption(
+                child: const Text('Câmera', style: TextStyle(fontSize: 16)),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 20, horizontal: 25),
+                onPressed: () => Navigator.of(context).pop(ImageSource.camera),
+              ),
+            ],
+          );
+        });
+  }
+
+  Future _takePicture(ImageSource imageSource) async {
     return await ImagePicker.pickImage(
-      source: ImageSource.camera,
+      source: imageSource,
       maxHeight: 200,
     );
   }
@@ -162,10 +189,7 @@ class _CreateUpdateImageState extends State<CreateUpdateImage> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        print('clickou');
-        FocusScope.of(context).requestFocus(FocusNode());
-      },
+      onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
       child: Container(
         height:
             MediaQuery.of(context).size.height * (_keyboardVisible ? 0.7 : 0.3),
