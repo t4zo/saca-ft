@@ -55,10 +55,10 @@ class _SignInViewState extends State<SignInView> {
     AuthController().authenticate(signInViewModel, userStore, sessionStore);
   }
 
-  void _signOut() {
+  Future _signOut() async {
     final userStore = Provider.of<UserStore>(context, listen: false);
     final sessionStore = Provider.of<SessionStore>(context, listen: false);
-    AuthController().signOut(userStore, sessionStore);
+    await AuthController().signOut(userStore, sessionStore);
   }
 
   Future _handleSignInAndSignOut() async {
@@ -147,7 +147,8 @@ class _SignInViewState extends State<SignInView> {
                                 return 'Por favor, informe sua senha';
                               return null;
                             },
-                            onSaved: (value) => signInViewModel.password = value,
+                            onSaved: (value) =>
+                                signInViewModel.password = value,
                           ),
                           SizedBox(
                             height: 10,

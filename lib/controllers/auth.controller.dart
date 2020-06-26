@@ -22,7 +22,7 @@ class AuthController {
     return Future.value(true);
   }
 
-  void authenticate(SignInViewModel signInViewModel, UserStore userStore,
+  Future authenticate(SignInViewModel signInViewModel, UserStore userStore,
       SessionStore sessionStore) async {
     final user = await _userRepository.authenticateAsync(signInViewModel);
     sessionStore.setSession(user);
@@ -33,7 +33,7 @@ class AuthController {
     return await _userRepository.signUp(model);
   }
 
-  void signOut(UserStore userStore, SessionStore sessionStore) async {
+  Future signOut(UserStore userStore, SessionStore sessionStore) async {
     userStore.setUser(null);
     await sessionStore.logout();
   }

@@ -85,7 +85,9 @@ class _ImagesViewState extends State<ImagesView> {
                     child: GridTile(
                       child: Image.network('$CLOUDINARY_URL/${_images[i].url}'),
                       footer: LayoutBuilder(
-                        builder: (BuildContext context, BoxConstraints constraints) => Container(
+                        builder: (BuildContext context,
+                                BoxConstraints constraints) =>
+                            Container(
                           padding: const EdgeInsets.symmetric(horizontal: 15),
                           child: Container(
                             color: Colors.white,

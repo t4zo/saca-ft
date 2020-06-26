@@ -37,7 +37,7 @@ class _SignUpScreenView extends State<SignUpView> {
     try {
       final result = await _authController.signUp(signUpViewModel);
       if (result)
-        _authController.authenticate(
+        await _authController.authenticate(
           SignInViewModel(
               email: signUpViewModel.email, password: signUpViewModel.password),
           Provider.of<UserStore>(context, listen: false),
@@ -170,9 +170,15 @@ class _SignUpScreenView extends State<SignUpView> {
                             Theme.of(context).primaryTextTheme.headline6.color,
                         onPressed: () async {
                           await _handleSignUp();
-                          if (userStore.isAuthenticated)
-                            Navigator.pushNamed(
+                          if (userStore.isAuthenticated) {
+                            return Navigator.pushNamed(
                                 context, CategoriesView.routeName);
+                          } else {
+                            return Future.value(Container(
+                              width: 0,
+                              height: 0,
+                            ));
+                          }
                         }),
                   ),
                 ],
