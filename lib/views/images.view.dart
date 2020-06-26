@@ -21,7 +21,8 @@ class _ImagesViewState extends State<ImagesView> {
   void initState() {
     super.initState();
     setState(() {
-      _images = _imagesController.getAll(Provider.of<CategoryStore>(context, listen: false).categories);
+      _images = _imagesController.getAll(
+          Provider.of<CategoryStore>(context, listen: false).categories);
     });
   }
 
@@ -83,16 +84,20 @@ class _ImagesViewState extends State<ImagesView> {
                     onTap: () => _ttsService.speak(_images[i].name),
                     child: GridTile(
                       child: Image.network('$CLOUDINARY_URL/${_images[i].url}'),
-                      footer: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: Text(
-                          '${_images[i].name}',
-                          style: TextStyle(
-                            color: Colors.black,
-                            backgroundColor: Colors.white,
+                      footer: LayoutBuilder(
+                        builder: (BuildContext context, BoxConstraints constraints) => Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 15),
+                          child: Container(
+                            color: Colors.white,
+                            width: constraints.maxWidth,
+                            // decoration: BoxDecoration(borderRadius: const BorderRadius.vertical(top: Radius.circular(10))),
+                            child: Text(
+                              '${_images[i].name}',
+                              style: TextStyle(color: Colors.black),
+                              textAlign: TextAlign.center,
+                              softWrap: true,
+                            ),
                           ),
-                          textAlign: TextAlign.center,
-                          softWrap: true,
                         ),
                       ),
                     ),
