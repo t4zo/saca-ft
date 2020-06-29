@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:saca/controllers/images.controller.dart';
 import 'package:saca/models/image.model.dart' as Images;
 import 'package:saca/services/tts.service.dart';
 import 'package:saca/settings.dart';
 import 'package:saca/stores/category.store.dart';
-import 'package:saca/stores/user.store.dart';
 
 class ImagesView extends StatefulWidget {
   @override
@@ -14,15 +12,14 @@ class ImagesView extends StatefulWidget {
 
 class _ImagesViewState extends State<ImagesView> {
   final _ttsService = TtsService();
-  final _imagesController = ImagesController();
   List<Images.Image> _images;
 
   @override
   void initState() {
     super.initState();
     setState(() {
-      _images = _imagesController.getAll(
-          Provider.of<CategoryStore>(context, listen: false).categories);
+      _images =
+          Provider.of<CategoryStore>(context, listen: false).getAllImages();
     });
   }
 
@@ -49,11 +46,8 @@ class _ImagesViewState extends State<ImagesView> {
                       style: TextStyle(color: Colors.red),
                     ),
                     onPressed: () async {
-                      await _imagesController.removeAsync(
-                        Provider.of<CategoryStore>(context, listen: false),
-                        Provider.of<UserStore>(context, listen: false).user,
-                        image,
-                      );
+                      await Provider.of<CategoryStore>(context, listen: false)
+                          .removeImage(image);
                       Navigator.of(context).pop();
                     })
               ],

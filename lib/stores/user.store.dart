@@ -3,7 +3,10 @@ import 'package:saca/models/user.model.dart';
 
 part 'user.store.g.dart';
 
-class UserStore = _UserStore with _$UserStore;
+// @injectable
+// class UserStore extends _UserStore with _$UserStore implements IUserStore {}
+
+class UserStore extends _UserStore with _$UserStore {}
 
 abstract class _UserStore with Store {
   @observable

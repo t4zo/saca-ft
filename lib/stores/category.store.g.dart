@@ -9,6 +9,13 @@ part of 'category.store.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
 mixin _$CategoryStore on _CategoryStore, Store {
+  Computed<List<CategoryViewModel>> _$categoriesComputed;
+
+  @override
+  List<CategoryViewModel> get categories => (_$categoriesComputed ??=
+          Computed<List<CategoryViewModel>>(() => super.categories))
+      .value;
+
   final _$_categoriesAtom = Atom(name: '_CategoryStore._categories');
 
   @override
@@ -24,6 +31,27 @@ mixin _$CategoryStore on _CategoryStore, Store {
       super._categories = value;
       _$_categoriesAtom.reportChanged();
     }, _$_categoriesAtom, name: '${_$_categoriesAtom.name}_set');
+  }
+
+  final _$addImageAsyncAction = AsyncAction('addImage');
+
+  @override
+  Future<bool> addImage(ImageViewModel imageViewModel) {
+    return _$addImageAsyncAction.run(() => super.addImage(imageViewModel));
+  }
+
+  final _$updateImageAsyncAction = AsyncAction('updateImage');
+
+  @override
+  Future<bool> updateImage(ImageViewModel image) {
+    return _$updateImageAsyncAction.run(() => super.updateImage(image));
+  }
+
+  final _$removeImageAsyncAction = AsyncAction('removeImage');
+
+  @override
+  Future<bool> removeImage(Image image) {
+    return _$removeImageAsyncAction.run(() => super.removeImage(image));
   }
 
   final _$_CategoryStoreActionController =
@@ -50,30 +78,10 @@ mixin _$CategoryStore on _CategoryStore, Store {
   }
 
   @override
-  void addImage(Image image) {
+  List<Image> getAllImages() {
     final _$actionInfo = _$_CategoryStoreActionController.startAction();
     try {
-      return super.addImage(image);
-    } finally {
-      _$_CategoryStoreActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
-  void updateImage(Image image) {
-    final _$actionInfo = _$_CategoryStoreActionController.startAction();
-    try {
-      return super.updateImage(image);
-    } finally {
-      _$_CategoryStoreActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
-  void removeImage(Image image) {
-    final _$actionInfo = _$_CategoryStoreActionController.startAction();
-    try {
-      return super.removeImage(image);
+      return super.getAllImages();
     } finally {
       _$_CategoryStoreActionController.endAction(_$actionInfo);
     }
@@ -81,7 +89,7 @@ mixin _$CategoryStore on _CategoryStore, Store {
 
   @override
   String toString() {
-    final string = '';
+    final string = 'categories: ${categories.toString()}';
     return '{$string}';
   }
 }

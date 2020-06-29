@@ -9,6 +9,23 @@ part of 'session.store.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
 mixin _$SessionStore on _SessionStore, Store {
+  Computed<dynamic> _$tokenComputed;
+
+  @override
+  dynamic get token =>
+      (_$tokenComputed ??= Computed<dynamic>(() => super.token)).value;
+  Computed<dynamic> _$expiryDateComputed;
+
+  @override
+  dynamic get expiryDate =>
+      (_$expiryDateComputed ??= Computed<dynamic>(() => super.expiryDate))
+          .value;
+  Computed<dynamic> _$authTimerComputed;
+
+  @override
+  dynamic get authTimer =>
+      (_$authTimerComputed ??= Computed<dynamic>(() => super.authTimer)).value;
+
   final _$_tokenAtom = Atom(name: '_SessionStore._token');
 
   @override
@@ -60,9 +77,66 @@ mixin _$SessionStore on _SessionStore, Store {
     }, _$_authTimerAtom, name: '${_$_authTimerAtom.name}_set');
   }
 
+  final _$authenticateAsyncAction = AsyncAction('authenticate');
+
+  @override
+  Future<dynamic> authenticate(SignInViewModel signInViewModel) {
+    return _$authenticateAsyncAction
+        .run(() => super.authenticate(signInViewModel));
+  }
+
+  final _$signUpAsyncAction = AsyncAction('signUp');
+
+  @override
+  Future<bool> signUp(SignUpViewModel model) {
+    return _$signUpAsyncAction.run(() => super.signUp(model));
+  }
+
+  final _$signOutAsyncAction = AsyncAction('signOut');
+
+  @override
+  Future<dynamic> signOut() {
+    return _$signOutAsyncAction.run(() => super.signOut());
+  }
+
+  final _$setSessionAsyncAction = AsyncAction('setSession');
+
+  @override
+  Future<dynamic> setSession() {
+    return _$setSessionAsyncAction.run(() => super.setSession());
+  }
+
+  final _$logoutAsyncAction = AsyncAction('logout');
+
+  @override
+  Future<dynamic> logout() {
+    return _$logoutAsyncAction.run(() => super.logout());
+  }
+
+  final _$tryAutoLoginAsyncAction = AsyncAction('tryAutoLogin');
+
+  @override
+  Future<User> tryAutoLogin() {
+    return _$tryAutoLoginAsyncAction.run(() => super.tryAutoLogin());
+  }
+
+  final _$_SessionStoreActionController =
+      ActionController(name: '_SessionStore');
+
+  @override
+  void _autoLogout() {
+    final _$actionInfo = _$_SessionStoreActionController.startAction();
+    try {
+      return super._autoLogout();
+    } finally {
+      _$_SessionStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
   @override
   String toString() {
-    final string = '';
+    final string =
+        'token: ${token.toString()},expiryDate: ${expiryDate.toString()},authTimer: ${authTimer.toString()}';
     return '{$string}';
   }
 }

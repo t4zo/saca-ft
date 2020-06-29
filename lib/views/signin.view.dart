@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
-import 'package:saca/controllers/auth.controller.dart';
 import 'package:saca/stores/session.store.dart';
 import 'package:saca/stores/user.store.dart';
 import 'package:saca/view-models/signin.viewmodel.dart';
@@ -9,6 +8,9 @@ import 'package:saca/views/categories.view.dart';
 
 class SignInView extends StatefulWidget {
   static const routeName = '/signin';
+  // IAuthController authController;
+
+  // SignInView(this.authController);
 
   @override
   _SignInViewState createState() => _SignInViewState();
@@ -16,11 +18,9 @@ class SignInView extends StatefulWidget {
 
 class _SignInViewState extends State<SignInView> {
   final _form = GlobalKey<FormState>();
-
   final _passwordFocusNode = FocusNode();
 
   var signInViewModel = SignInViewModel(busy: false);
-
   var _initialValues = {'email': '', 'password': ''};
 
   @override
@@ -49,16 +49,8 @@ class _SignInViewState extends State<SignInView> {
 
     _form.currentState.save();
 
-    final userStore = Provider.of<UserStore>(context, listen: false);
-    final sessionStore = Provider.of<SessionStore>(context, listen: false);
-
-    AuthController().authenticate(signInViewModel, userStore, sessionStore);
-  }
-
-  Future _signOut() async {
-    final userStore = Provider.of<UserStore>(context, listen: false);
-    final sessionStore = Provider.of<SessionStore>(context, listen: false);
-    await AuthController().signOut(userStore, sessionStore);
+    Provider.of<SessionStore>(context, listen: false)
+        .authenticate(signInViewModel);
   }
 
   Future _handleSignInAndSignOut() async {
@@ -72,7 +64,7 @@ class _SignInViewState extends State<SignInView> {
       await _signIn();
       Navigator.pushNamed(context, CategoriesView.routeName);
     } else {
-      _signOut();
+      Provider.of<SessionStore>(context, listen: false).signOut();
       _initialValues['password'] = '';
     }
 

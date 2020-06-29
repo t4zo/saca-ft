@@ -9,10 +9,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart' as syspaths;
 import 'package:provider/provider.dart';
-import 'package:saca/controllers/images.controller.dart';
 import 'package:saca/settings.dart';
 import 'package:saca/stores/category.store.dart';
-import 'package:saca/stores/user.store.dart';
 import 'package:saca/view-models/image.viewmodel.dart';
 import 'package:saca/models/image.model.dart' as Images;
 import 'package:uuid/uuid.dart';
@@ -145,8 +143,6 @@ class _CreateUpdateImageState extends State<CreateUpdateImage> {
 
     _form.currentState.save();
 
-    final imagesController = ImagesController();
-    final user = Provider.of<UserStore>(context, listen: false).user;
     final categoryStore = Provider.of<CategoryStore>(context, listen: false);
 
     final imageBytes = await _image.readAsBytes();
@@ -159,17 +155,14 @@ class _CreateUpdateImageState extends State<CreateUpdateImage> {
 
     bool result;
     if (_isUpdate) {
-      result = await imagesController.updateAsync(
-          categoryStore,
-          user,
-          ImageViewModel(
-            id: widget.image.id,
-            categoryId: _model.categoryId,
-            name: _model.name,
-            base64: _model.base64,
-          ));
+      result = await categoryStore.updateImage(ImageViewModel(
+        id: widget.image.id,
+        categoryId: _model.categoryId,
+        name: _model.name,
+        base64: _model.base64,
+      ));
     } else {
-      result = await imagesController.createAsync(categoryStore, user, _model);
+      result = await categoryStore.addImage(_model);
     }
 
     setState(() {

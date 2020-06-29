@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
-import 'package:saca/controllers/images.controller.dart';
 import 'package:saca/models/image.model.dart' as Images;
-import 'package:saca/controllers/categories.controller.dart';
 import 'package:saca/services/tts.service.dart';
 import 'package:saca/settings.dart';
 
@@ -20,10 +18,10 @@ class CategoriesView extends StatefulWidget {
 
 class _CategoriesViewState extends State<CategoriesView> {
   final _ttsService = TtsService();
-  final _categoriesController = CategoriesController();
-  final _imagesController = ImagesController();
 
   Future _showBottomSheet([Images.Image image]) async {
+    if (image != null && image.categoryId != 1) return;
+    
     return showModalBottomSheet(
       context: context,
       builder: (ctx) =>
@@ -57,11 +55,8 @@ class _CategoriesViewState extends State<CategoriesView> {
                       style: TextStyle(color: Colors.red),
                     ),
                     onPressed: () async {
-                      await _imagesController.removeAsync(
-                        Provider.of<CategoryStore>(context, listen: false),
-                        Provider.of<UserStore>(context, listen: false).user,
-                        image,
-                      );
+                      await Provider.of<CategoryStore>(context, listen: false)
+                          .removeImage(image);
                       Navigator.of(context).pop();
                     })
               ],
@@ -77,8 +72,7 @@ class _CategoriesViewState extends State<CategoriesView> {
       builder: (_) => Scaffold(
         body: SafeArea(
           child: FutureBuilder(
-            future:
-                _categoriesController.getAllAsync(_userStore, _categoryStore),
+            future: _categoryStore.getAllAsync(),
             builder: (ctx, snp) {
               if (snp.connectionState != ConnectionState.done) {
                 return Container(
@@ -88,14 +82,12 @@ class _CategoriesViewState extends State<CategoriesView> {
               }
               return Observer(
                 builder: (_) => RefreshIndicator(
-                  onRefresh: () => _categoriesController.getAllAsync(
-                      _userStore, _categoryStore),
+                  onRefresh: () => _categoryStore.getAllAsync(),
                   child: SingleChildScrollView(
                     child: ExpansionPanelList(
                       expandedHeaderPadding: const EdgeInsets.all(0),
                       expansionCallback: (index, isExpanded) {
-                        _categoriesController.toggleExpanded(
-                            _categoryStore, index, isExpanded);
+                        _categoryStore.toggleExpanded(index, isExpanded);
                       },
                       children: _categoryStore.categories
                           .map<ExpansionPanel>(

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
-import 'package:saca/controllers/auth.controller.dart';
 import 'package:saca/stores/session.store.dart';
 import 'package:saca/stores/user.store.dart';
 import 'package:saca/view-models/signin.viewmodel.dart';
@@ -16,8 +15,6 @@ class SignUpView extends StatefulWidget {
 }
 
 class _SignUpScreenView extends State<SignUpView> {
-  final _authController = AuthController();
-
   final _form = GlobalKey<FormState>();
 
   final _emailFocusNode = FocusNode();
@@ -34,15 +31,13 @@ class _SignUpScreenView extends State<SignUpView> {
     if (!isValid) return;
 
     _form.currentState.save();
+    final sessionStore = Provider.of<SessionStore>(context, listen: false);
+
     try {
-      final result = await _authController.signUp(signUpViewModel);
+      final result = await sessionStore.signUp(signUpViewModel);
       if (result)
-        await _authController.authenticate(
-          SignInViewModel(
-              email: signUpViewModel.email, password: signUpViewModel.password),
-          Provider.of<UserStore>(context, listen: false),
-          Provider.of<SessionStore>(context, listen: false),
-        );
+        await sessionStore.authenticate(SignInViewModel(
+            email: signUpViewModel.email, password: signUpViewModel.password));
     } catch (error) {
       print(error);
       return null;

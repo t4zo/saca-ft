@@ -16,7 +16,7 @@ class CategoryViewModel {
     this.isExpanded = false;
   }
 
-  List<CategoryViewModel> fromCategoryList(List<Category> categories) {
+  static List<CategoryViewModel> fromCategoryList(List<Category> categories) {
     var cvm = new List<CategoryViewModel>();
 
     categories.forEach((c) {

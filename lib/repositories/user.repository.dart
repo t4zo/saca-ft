@@ -1,11 +1,13 @@
 import 'package:dio/dio.dart';
+import 'package:saca/interfaces/i_user_repository.dart';
 import 'package:saca/models/user.model.dart';
 import 'package:saca/services/http.service.dart';
 import 'package:saca/settings.dart';
 import 'package:saca/view-models/signin.viewmodel.dart';
 import 'package:saca/view-models/signup.viewmodel.dart';
 
-class UserRepository {
+// @Injectable(as: IUserRepository)
+class UserRepository implements IUserRepository {
   HttpService _httpService;
 
   UserRepository() {
@@ -13,6 +15,7 @@ class UserRepository {
     // _httpService.dio.options.baseUrl += '/auth';
   }
 
+  @override
   Future<User> authenticateAsync(SignInViewModel model) async {
     model.remember = false;
 
@@ -28,6 +31,7 @@ class UserRepository {
     return null;
   }
 
+  @override
   Future<bool> signUp(SignUpViewModel model) async {
     model.roles = ['usuario'];
 

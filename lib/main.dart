@@ -2,7 +2,9 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:saca/controllers/auth.controller.dart';
+import 'package:saca/repositories/category.repository.dart';
+import 'package:saca/repositories/image.repository.dart';
+import 'package:saca/repositories/user.repository.dart';
 import 'package:saca/stores/session.store.dart';
 
 import 'package:saca/stores/user.store.dart';
@@ -22,6 +24,7 @@ class MyHttpOverrides extends HttpOverrides {
 }
 
 void main() {
+  // configureInjection(Environment.dev);
   HttpOverrides.global = new MyHttpOverrides();
   runApp(MyApp());
 }
@@ -32,8 +35,14 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         Provider<UserStore>(create: (_) => UserStore()),
-        Provider<SessionStore>(create: (_) => SessionStore()),
-        Provider<CategoryStore>(create: (_) => CategoryStore()),
+        ProxyProvider<UserStore, SessionStore>(
+          update: (_, userStore, sessionStore) =>
+              SessionStore(userStore, UserRepository()),
+        ),
+        ProxyProvider<UserStore, CategoryStore>(
+          update: (_, userStore, categoryStore) =>
+              CategoryStore(userStore, CategoryRepository(), ImageRepository()),
+        ),
       ],
       child: Saca(),
     );
@@ -43,8 +52,6 @@ class MyApp extends StatelessWidget {
 class Saca extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final _authController = AuthController();
-
     return MaterialApp(
       title: 'SACA',
       debugShowCheckedModeBanner: false,
@@ -60,7 +67,8 @@ class Saca extends StatelessWidget {
         ),
       ),
       home: FutureBuilder(
-        future: _authController.tryAutoLogin(context),
+        future:
+            Provider.of<SessionStore>(context, listen: false).tryAutoLogin(),
         builder: (ctx, snp) => snp.connectionState == ConnectionState.done
             ? TabsScreen()
             : SplashScreen(),
