@@ -1,52 +1,67 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:dio/dio.dart';
-import 'package:saca/interfaces/i_user_repository.dart';
+import 'package:saca/constants/http.constants.dart';
+import 'package:saca/constants/validation.constants.dart';
 import 'package:saca/models/user.model.dart';
+import 'package:saca/models/http_response.dart';
 import 'package:saca/services/http.service.dart';
-import 'package:saca/settings.dart';
 import 'package:saca/view-models/signin.viewmodel.dart';
 import 'package:saca/view-models/signup.viewmodel.dart';
 
-// @Injectable(as: IUserRepository)
-class UserRepository implements IUserRepository {
+class UserRepository {
   HttpService _httpService;
 
   UserRepository() {
     _httpService = HttpService();
-    // _httpService.dio.options.baseUrl += '/auth';
+    _httpService.dio.options.baseUrl += '/auth';
   }
 
-  @override
-  Future<User> authenticateAsync(SignInViewModel model) async {
+  Future<HttpResponse<User>> authenticateAsync(SignInViewModel model) async {
     model.remember = false;
 
-    Response response =
-        await _httpService.dio.post('/auth/authenticate', data: model);
+    try {
+      Response response =
+          await _httpService.dio.post('/authenticate', data: model);
 
-    if (response.statusCode == 200) {
-      final user = User.fromJson(response.data['user']);
-      userToken = user.token;
-      return user;
+      if (response.statusCode == 200) {
+        final user = User.fromJson(response.data['user']);
+        return HttpResponse(response: user);
+      }
+
+      return HttpResponse(error: DioError(error: HttpConstants.CODE_NOT_200));
+    } on DioError catch (error) {
+      // final errorMessage = json.decode(error.response.data)['detail'];
+      final errorResponse = json.decode(error.response.data)['errors'] as Map<String, dynamic>;
+      final errorField = errorResponse.entries.first;
+      return HttpResponse(error: error, errorMessage: errorField.value.first);
     }
-
-    return null;
   }
 
-  @override
-  Future<bool> signUp(SignUpViewModel model) async {
+  Future<HttpResponse<bool>> signUp(SignUpViewModel model) async {
     model.roles = ['usuario'];
 
-    Response response = await _httpService.dio.post('/auth', data: {
-      'username': model.email,
-      'email': model.email,
-      'password': model.password,
-      'confirmPassword': model.confirmPassword,
-      'roles': model.roles,
-    });
+    try {
+      Response response = await _httpService.dio.post('', data: {
+        'username': model.email,
+        'email': model.email,
+        'password': model.password,
+        'confirmPassword': model.confirmPassword,
+        'roles': model.roles,
+      });
 
-    if (response.statusCode == 200) {
-      return Future.value(true);
+      if (response.statusCode == 200) {
+        return HttpResponse(response: true);
+      }
+
+      return HttpResponse(
+          error: DioError(error: HttpConstants.CODE_NOT_200),
+          errorMessage: FieldConstants.INVALID);
+    } on DioError catch (error) {
+      final errorResponse = json.decode(error.response.data)['errors'] as Map<String, dynamic>;
+      final errorField = errorResponse.entries.first;
+      return HttpResponse(error: error, errorMessage: errorField.value.first);
     }
-
-    return null;
   }
 }

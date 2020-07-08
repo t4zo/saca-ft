@@ -9,6 +9,13 @@ import 'package:saca/view-models/image.viewmodel.dart';
 
 part 'category.store.g.dart';
 
+class ImageStoreResponse {
+  bool response;
+  String errorMessage;
+
+  ImageStoreResponse({this.response, this.errorMessage});
+}
+
 class CategoryStore extends _CategoryStore with _$CategoryStore {
   CategoryStore(UserStore userStore, CategoryRepository categoryRepository,
       ImageRepository imageRepository)
@@ -23,11 +30,11 @@ abstract class _CategoryStore with Store {
   @observable
   List<CategoryViewModel> _categories = [];
 
-  @computed
-  List<CategoryViewModel> get categories => [..._categories];
-
   _CategoryStore(
       this._userStore, this._categoryRepository, this._imageRepository);
+
+  @computed
+  List<CategoryViewModel> get categories => [..._categories];
 
   @action
   void setCategories(List<CategoryViewModel> categories) {
@@ -55,39 +62,44 @@ abstract class _CategoryStore with Store {
   }
 
   @action
-  Future<bool> addImage(ImageViewModel imageViewModel) async {
-    final image =
-        await _imageRepository.create(_userStore.user, imageViewModel);
-    if (image == null) return false;
+  Future<String> addImageAsync(ImageViewModel imageViewModel) async {
+    final http = await _imageRepository.createAsync(_userStore.user, imageViewModel);
+
+    if (http.error != null) return http.errorMessage;
+
+    final image = http.response;
+    if (image == null) return "Imagem não encontrada";
 
     final newCategories = categories;
     final category =
         newCategories.firstWhere((category) => category.id == image.categoryId);
 
     final index = newCategories.indexOf(category);
-    if (index == -1) return false;
+    if (index == -1) return "Categoria não encontrada";
 
     newCategories[index].images.add(image);
     _categories = newCategories;
 
-    return true;
+    return "";
   }
 
   @action
-  Future<bool> updateImage(ImageViewModel image) async {
-    final updatedImage = await _imageRepository.update(_userStore.user, image);
-    if (updatedImage == null) return false;
+  Future<String> updateImageAsync(ImageViewModel image) async {
+    final http = await _imageRepository.updateAsync(_userStore.user, image);
+    if (http.error != null) return http.errorMessage;
+
+    final updatedImage = http.response;
+    if (updatedImage == null) return "Imagem não encontrada";
 
     final newCategories = categories;
     final category = newCategories
         .firstWhere((category) => category.id == updatedImage.categoryId);
 
     final categoryIndex = newCategories.indexOf(category);
-    if (categoryIndex == -1) return false;
+    if (categoryIndex == -1) return "Categoria não encontrada";
 
     final _image =
         newCategories[categoryIndex].images.firstWhere((i) => i.id == image.id);
-    if (_image == null) return false;
 
     final imageIndex = newCategories[categoryIndex].images.indexOf(_image);
 
@@ -95,37 +107,51 @@ abstract class _CategoryStore with Store {
 
     _categories = newCategories;
 
-    return true;
+    return "";
   }
 
   @action
-  Future<bool> removeImage(Image image) async {
-    final _image = await _imageRepository.remove(_userStore.user, image);
-    if (_image == null) return false;
+  Future<String> removeImageAsync(Image image) async {
+    final http = await _imageRepository.removeAsync(_userStore.user, image);
+    if (http.error != null) return http.errorMessage;
+
+    final _image = await _imageRepository.removeAsync(_userStore.user, image);
+    if (_image == null) return "Imagem não encontrada";
 
     final newCategories = categories;
     final category =
         newCategories.firstWhere((category) => category.id == image.categoryId);
 
     final index = newCategories.indexOf(category);
-    if (index == -1) return false;
+    if (index == -1) return "Categoria não encontrada";
 
     newCategories[index].images.removeWhere((i) => i.id == image.id);
     _categories = newCategories;
 
-    return true;
+    return "";
   }
 
-  Future getAllAsync() async {
+  @action
+  Future<String> getAllAsync() async {
     List<Category> categories;
 
     if (!_userStore.isAuthenticated) {
-      categories = await _categoryRepository.getAllHome();
+      final http = await _categoryRepository.getAllHomeAsync();
+
+      if (http.error != null) return http.errorMessage;
+
+      categories = http.response;
     } else {
-      categories = await _categoryRepository.getAll(_userStore.user);
+      final http = await _categoryRepository.getAllAsync(_userStore.user);
+
+      if (http.error != null) return http.errorMessage;
+
+      categories = http.response;
     }
 
     final cvm = CategoryViewModel.fromCategoryList(categories);
     setCategories(cvm);
+
+    return "";
   }
 }

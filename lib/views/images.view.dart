@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:saca/constants/services.constants.dart';
 import 'package:saca/models/image.model.dart' as Images;
 import 'package:saca/services/tts.service.dart';
-import 'package:saca/settings.dart';
 import 'package:saca/stores/category.store.dart';
 
 class ImagesView extends StatefulWidget {
@@ -21,37 +21,6 @@ class _ImagesViewState extends State<ImagesView> {
       _images =
           Provider.of<CategoryStore>(context, listen: false).getAllImages();
     });
-  }
-
-  Future _handleLongPress(Images.Image image) async {
-    if (image.categoryId != 1) return;
-
-    await showDialog(
-        context: context,
-        builder: (ctx) => AlertDialog(
-              title: const Text('Remover Imagem'),
-              content: Text('Tem certeza que deseja remover `${image.name}`?'),
-              actions: <Widget>[
-                FlatButton(
-                  child: Text(
-                    'Voltar',
-                    style: TextStyle(
-                        color: Theme.of(context).textTheme.headline6.color),
-                  ),
-                  onPressed: () => Navigator.of(context).pop(),
-                ),
-                FlatButton(
-                    child: const Text(
-                      'Remover',
-                      style: TextStyle(color: Colors.red),
-                    ),
-                    onPressed: () async {
-                      await Provider.of<CategoryStore>(context, listen: false)
-                          .removeImage(image);
-                      Navigator.of(context).pop();
-                    })
-              ],
-            ));
   }
 
   @override
@@ -74,10 +43,11 @@ class _ImagesViewState extends State<ImagesView> {
                 itemBuilder: (ctx, i) => ClipRRect(
                   borderRadius: BorderRadius.circular(10),
                   child: GestureDetector(
-                    onLongPress: () => _handleLongPress(_images[i]),
+                    onLongPress: () => _handleLongPressAsync(_images[i]),
                     onTap: () => _ttsService.speak(_images[i].name),
                     child: GridTile(
-                      child: Image.network('$CLOUDINARY_URL/${_images[i].url}'),
+                      child: Image.network(
+                          '${ServicesConstants.CLOUDINARY_URL}/${_images[i].url}'),
                       footer: LayoutBuilder(
                         builder: (BuildContext context,
                                 BoxConstraints constraints) =>
@@ -102,5 +72,36 @@ class _ImagesViewState extends State<ImagesView> {
               ),
       ),
     );
+  }
+
+  Future _handleLongPressAsync(Images.Image image) async {
+    if (image.categoryId != 1) return;
+
+    await showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+              title: const Text('Remover Imagem'),
+              content: Text('Tem certeza que deseja remover ${image.name}?'),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text(
+                    'Voltar',
+                    style: TextStyle(
+                        color: Theme.of(context).textTheme.headline6.color),
+                  ),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+                FlatButton(
+                    child: const Text(
+                      'Remover',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                    onPressed: () async {
+                      await Provider.of<CategoryStore>(context, listen: false)
+                          .removeImageAsync(image);
+                      Navigator.of(context).pop();
+                    })
+              ],
+            ));
   }
 }

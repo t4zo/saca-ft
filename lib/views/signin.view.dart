@@ -43,40 +43,6 @@ class _SignInViewState extends State<SignInView> {
     _passwordFocusNode.dispose();
   }
 
-  Future _signIn() async {
-    final isValid = _form.currentState.validate();
-    if (!isValid) return;
-
-    _form.currentState.save();
-
-    Provider.of<SessionStore>(context, listen: false)
-        .authenticate(signInViewModel);
-  }
-
-  Future _handleSignInAndSignOut() async {
-    final _userStore = Provider.of<UserStore>(context, listen: false);
-
-    setState(() {
-      signInViewModel.busy = true;
-    });
-
-    if (!_userStore.isAuthenticated) {
-      await _signIn();
-      Navigator.pushNamed(context, CategoriesView.routeName);
-    } else {
-      Provider.of<SessionStore>(context, listen: false).signOut();
-      _initialValues['password'] = '';
-    }
-
-    setState(() {
-      signInViewModel.busy = false;
-    });
-  }
-
-  void _handleRemoveAccount() {}
-
-  void _handleRecoverPassword() {}
-
   @override
   Widget build(BuildContext context) {
     final _userStore = Provider.of<UserStore>(context, listen: false);
@@ -184,7 +150,7 @@ class _SignInViewState extends State<SignInView> {
                     color: Theme.of(context).primaryColor,
                     textColor:
                         Theme.of(context).primaryTextTheme.headline6.color,
-                    onPressed: _handleSignInAndSignOut,
+                    onPressed: _handleSignInAndSignOutAsync,
                   ),
                 ],
               ),
@@ -194,4 +160,44 @@ class _SignInViewState extends State<SignInView> {
       ),
     );
   }
+
+  Future<String> _signInAsync() async {
+    final isValid = _form.currentState.validate();
+    if (!isValid) return "Algum campo está inválido";
+
+    _form.currentState.save();
+
+    return Provider.of<SessionStore>(context, listen: false)
+        .authenticateAsync(signInViewModel);
+  }
+
+  Future _handleSignInAndSignOutAsync() async {
+    final _userStore = Provider.of<UserStore>(context, listen: false);
+
+    setState(() {
+      signInViewModel.busy = true;
+    });
+
+    if (!_userStore.isAuthenticated) {
+      final result = await _signInAsync();
+      if (result.isEmpty) {
+        Navigator.pushNamed(context, CategoriesView.routeName);
+      } else {
+        Scaffold.of(context).showSnackBar(SnackBar(
+          content: Text(result),
+        ));
+      }
+    } else {
+      Provider.of<SessionStore>(context, listen: false).signOutAsync();
+      _initialValues['password'] = '';
+    }
+
+    setState(() {
+      signInViewModel.busy = false;
+    });
+  }
+
+  void _handleRemoveAccount() {}
+
+  void _handleRecoverPassword() {}
 }

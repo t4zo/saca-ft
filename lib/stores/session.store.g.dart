@@ -77,47 +77,47 @@ mixin _$SessionStore on _SessionStore, Store {
     }, _$_authTimerAtom, name: '${_$_authTimerAtom.name}_set');
   }
 
-  final _$authenticateAsyncAction = AsyncAction('authenticate');
+  final _$authenticateAsyncAsyncAction = AsyncAction('authenticateAsync');
 
   @override
-  Future<dynamic> authenticate(SignInViewModel signInViewModel) {
-    return _$authenticateAsyncAction
-        .run(() => super.authenticate(signInViewModel));
+  Future<String> authenticateAsync(SignInViewModel signInViewModel) {
+    return _$authenticateAsyncAsyncAction
+        .run(() => super.authenticateAsync(signInViewModel));
   }
 
-  final _$signUpAsyncAction = AsyncAction('signUp');
+  final _$signUpAsyncAsyncAction = AsyncAction('signUpAsync');
 
   @override
-  Future<bool> signUp(SignUpViewModel model) {
-    return _$signUpAsyncAction.run(() => super.signUp(model));
+  Future<String> signUpAsync(SignUpViewModel model) {
+    return _$signUpAsyncAsyncAction.run(() => super.signUpAsync(model));
   }
 
-  final _$signOutAsyncAction = AsyncAction('signOut');
+  final _$signOutAsyncAsyncAction = AsyncAction('signOutAsync');
 
   @override
-  Future<dynamic> signOut() {
-    return _$signOutAsyncAction.run(() => super.signOut());
+  Future<dynamic> signOutAsync() {
+    return _$signOutAsyncAsyncAction.run(() => super.signOutAsync());
   }
 
-  final _$setSessionAsyncAction = AsyncAction('setSession');
+  final _$setSessionAsyncAsyncAction = AsyncAction('setSessionAsync');
 
   @override
-  Future<dynamic> setSession() {
-    return _$setSessionAsyncAction.run(() => super.setSession());
+  Future<dynamic> setSessionAsync() {
+    return _$setSessionAsyncAsyncAction.run(() => super.setSessionAsync());
   }
 
-  final _$logoutAsyncAction = AsyncAction('logout');
+  final _$logoutAsyncAsyncAction = AsyncAction('logoutAsync');
 
   @override
-  Future<dynamic> logout() {
-    return _$logoutAsyncAction.run(() => super.logout());
+  Future<dynamic> logoutAsync() {
+    return _$logoutAsyncAsyncAction.run(() => super.logoutAsync());
   }
 
-  final _$tryAutoLoginAsyncAction = AsyncAction('tryAutoLogin');
+  final _$tryAutoLoginAsyncAsyncAction = AsyncAction('tryAutoLoginAsync');
 
   @override
-  Future<User> tryAutoLogin() {
-    return _$tryAutoLoginAsyncAction.run(() => super.tryAutoLogin());
+  Future<User> tryAutoLoginAsync() {
+    return _$tryAutoLoginAsyncAsyncAction.run(() => super.tryAutoLoginAsync());
   }
 
   final _$_SessionStoreActionController =

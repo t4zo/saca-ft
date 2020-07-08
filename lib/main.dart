@@ -57,7 +57,7 @@ class Saca extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.purple,
-        accentColor: Colors.amberAccent[200],
+        accentColor: Colors.white,
         errorColor: Colors.red,
         fontFamily: 'Quicksand',
         appBarTheme: AppBarTheme(
@@ -68,7 +68,7 @@ class Saca extends StatelessWidget {
       ),
       home: FutureBuilder(
         future:
-            Provider.of<SessionStore>(context, listen: false).tryAutoLogin(),
+            Provider.of<SessionStore>(context, listen: false).tryAutoLoginAsync(),
         builder: (ctx, snp) => snp.connectionState == ConnectionState.done
             ? TabsScreen()
             : SplashScreen(),

@@ -26,24 +26,6 @@ class _SignUpScreenView extends State<SignUpView> {
 
   var signUpViewModel = SignUpViewModel();
 
-  Future _handleSignUp() async {
-    final isValid = _form.currentState.validate();
-    if (!isValid) return;
-
-    _form.currentState.save();
-    final sessionStore = Provider.of<SessionStore>(context, listen: false);
-
-    try {
-      final result = await sessionStore.signUp(signUpViewModel);
-      if (result)
-        await sessionStore.authenticate(SignInViewModel(
-            email: signUpViewModel.email, password: signUpViewModel.password));
-    } catch (error) {
-      print(error);
-      return null;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final userStore = Provider.of<UserStore>(context, listen: false);
@@ -78,11 +60,11 @@ class _SignUpScreenView extends State<SignUpView> {
                             onFieldSubmitted: (_) => FocusScope.of(context)
                                 .requestFocus(_emailFocusNode),
                             decoration: InputDecoration(
-                              labelText: 'Usuário',
+                              labelText: 'Nome',
                             ),
                             validator: (value) {
                               if (value.isEmpty)
-                                return 'Por favor, informe seu usuário';
+                                return 'Por favor, informe seu nome';
                               return null;
                             },
                             onSaved: (value) =>
@@ -164,7 +146,7 @@ class _SignUpScreenView extends State<SignUpView> {
                         textColor:
                             Theme.of(context).primaryTextTheme.headline6.color,
                         onPressed: () async {
-                          await _handleSignUp();
+                          await _handleSignUpAsync();
                           if (userStore.isAuthenticated) {
                             return Navigator.pushNamed(
                                 context, CategoriesView.routeName);
@@ -183,5 +165,21 @@ class _SignUpScreenView extends State<SignUpView> {
         ),
       ),
     );
+  }
+
+  Future _handleSignUpAsync() async {
+    final isValid = _form.currentState.validate();
+    if (!isValid) return;
+
+    _form.currentState.save();
+
+    final sessionStore = Provider.of<SessionStore>(context, listen: false);
+    final response = await sessionStore.signUpAsync(signUpViewModel);
+    if (response.isEmpty) {
+      await sessionStore.authenticateAsync(SignInViewModel(
+          email: signUpViewModel.email, password: signUpViewModel.password));
+    } else {
+      Scaffold.of(context).showSnackBar(SnackBar(content: Text(response)));
+    }
   }
 }

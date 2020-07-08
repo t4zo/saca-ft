@@ -33,25 +33,35 @@ mixin _$CategoryStore on _CategoryStore, Store {
     }, _$_categoriesAtom, name: '${_$_categoriesAtom.name}_set');
   }
 
-  final _$addImageAsyncAction = AsyncAction('addImage');
+  final _$addImageAsyncAsyncAction = AsyncAction('addImageAsync');
 
   @override
-  Future<bool> addImage(ImageViewModel imageViewModel) {
-    return _$addImageAsyncAction.run(() => super.addImage(imageViewModel));
+  Future<String> addImageAsync(ImageViewModel imageViewModel) {
+    return _$addImageAsyncAsyncAction
+        .run(() => super.addImageAsync(imageViewModel));
   }
 
-  final _$updateImageAsyncAction = AsyncAction('updateImage');
+  final _$updateImageAsyncAsyncAction = AsyncAction('updateImageAsync');
 
   @override
-  Future<bool> updateImage(ImageViewModel image) {
-    return _$updateImageAsyncAction.run(() => super.updateImage(image));
+  Future<String> updateImageAsync(ImageViewModel image) {
+    return _$updateImageAsyncAsyncAction
+        .run(() => super.updateImageAsync(image));
   }
 
-  final _$removeImageAsyncAction = AsyncAction('removeImage');
+  final _$removeImageAsyncAsyncAction = AsyncAction('removeImageAsync');
 
   @override
-  Future<bool> removeImage(Image image) {
-    return _$removeImageAsyncAction.run(() => super.removeImage(image));
+  Future<String> removeImageAsync(Image image) {
+    return _$removeImageAsyncAsyncAction
+        .run(() => super.removeImageAsync(image));
+  }
+
+  final _$getAllAsyncAsyncAction = AsyncAction('getAllAsync');
+
+  @override
+  Future<String> getAllAsync() {
+    return _$getAllAsyncAsyncAction.run(() => super.getAllAsync());
   }
 
   final _$_CategoryStoreActionController =

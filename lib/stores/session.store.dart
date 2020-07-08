@@ -46,28 +46,34 @@ abstract class _SessionStore with Store {
     if (_authTimer != null) {
       _authTimer.cancel();
     }
-    _authTimer = Timer(Duration(hours: _timeToExpiry), logout);
+    _authTimer = Timer(Duration(hours: _timeToExpiry), logoutAsync);
   }
 
   @action
-  Future authenticate(SignInViewModel signInViewModel) async {
-    final user = await _userRepository.authenticateAsync(signInViewModel);
-    _userStore.setUser(user);
+  Future<String> authenticateAsync(SignInViewModel signInViewModel) async {
+    final http = await _userRepository.authenticateAsync(signInViewModel);
+    if(http.error != null) return http.errorMessage;
+    
+    _userStore.setUser(http.response);
+    return "";
   }
 
   @action
-  Future<bool> signUp(SignUpViewModel model) async {
-    return await _userRepository.signUp(model);
+  Future<String> signUpAsync(SignUpViewModel model) async {
+    final http = await _userRepository.signUp(model);
+    if(http.error != null) return http.errorMessage;
+
+    return "";
   }
 
   @action
-  Future signOut() async {
+  Future signOutAsync() async {
     _userStore.setUser(null);
-    await logout();
+    await logoutAsync();
   }
 
   @action
-  Future setSession() async {
+  Future setSessionAsync() async {
     final user = _userStore.user;
     _token = user.token;
     _expiryDate = DateTime.now().add(Duration(hours: 24));
@@ -81,7 +87,7 @@ abstract class _SessionStore with Store {
   }
 
   @action
-  Future logout() async {
+  Future logoutAsync() async {
     _expiryDate = null;
     if (_authTimer != null) {
       _authTimer.cancel();
@@ -92,7 +98,7 @@ abstract class _SessionStore with Store {
   }
 
   @action
-  Future<User> tryAutoLogin() async {
+  Future<User> tryAutoLoginAsync() async {
     final preferences = await SharedPreferences.getInstance();
     if (!preferences.containsKey('@session')) return null;
 

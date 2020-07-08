@@ -9,7 +9,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart' as syspaths;
 import 'package:provider/provider.dart';
-import 'package:saca/settings.dart';
+import 'package:saca/constants/services.constants.dart';
 import 'package:saca/stores/category.store.dart';
 import 'package:saca/view-models/image.viewmodel.dart';
 import 'package:saca/models/image.model.dart' as Images;
@@ -46,136 +46,7 @@ class _CreateUpdateImageState extends State<CreateUpdateImage> {
     });
 
     if (widget.image != null) {
-      _handleInitialFileConfiguration();
-    }
-  }
-
-  void _handleInitialFileConfiguration() async {
-    final tempDir = await syspaths.getTemporaryDirectory();
-    final localDirectoryPath = '${tempDir.path}/tempDirectory';
-    final localImagePath = '$localDirectoryPath/${Uuid().v4()}.jpg';
-
-    resetDirectory(localDirectoryPath);
-    downloadFile(localImagePath);
-  }
-
-  void downloadFile(String localImagePath) async {
-    final localFile = File(localImagePath);
-
-    final response = await Dio()
-        .download('$CLOUDINARY_URL/${widget.image.url}', localImagePath);
-
-    if (response.statusCode != 200) return;
-
-    setState(() {
-      _isUpdate = true;
-      _nameController.text = widget.image.name;
-      _model.name = widget.image.name;
-      _image = localFile;
-    });
-  }
-
-  void resetDirectory(localDirectoryPath) {
-    final localDirectory = Directory(localDirectoryPath);
-    if (localDirectory.existsSync()) {
-      localDirectory.deleteSync(recursive: true);
-    }
-    localDirectory.createSync();
-  }
-
-  Future _handlePicture() async {
-    final imageSource = await _chooseCaptureMethod();
-    final image = await _takePicture(imageSource);
-    if (image != null) {
-      await _saveLocalPicture(image);
-    }
-  }
-
-  Future<ImageSource> _chooseCaptureMethod() async {
-    return await showDialog<ImageSource>(
-        context: context,
-        builder: (_) {
-          return SimpleDialog(
-            title: Text('Escolha o modo',
-                style: TextStyle(
-                    fontSize: Theme.of(context).textTheme.headline6.fontSize)),
-            children: <Widget>[
-              SimpleDialogOption(
-                child: const Text('Galeria', style: TextStyle(fontSize: 16)),
-                padding:
-                    const EdgeInsets.symmetric(vertical: 20, horizontal: 25),
-                onPressed: () => Navigator.of(context).pop(ImageSource.gallery),
-              ),
-              SimpleDialogOption(
-                child: const Text('Câmera', style: TextStyle(fontSize: 16)),
-                padding:
-                    const EdgeInsets.symmetric(vertical: 20, horizontal: 25),
-                onPressed: () => Navigator.of(context).pop(ImageSource.camera),
-              ),
-            ],
-          );
-        });
-  }
-
-  Future _takePicture(ImageSource imageSource) async {
-    return await ImagePicker.pickImage(
-      source: imageSource,
-      maxHeight: 200,
-    );
-  }
-
-  Future _saveLocalPicture(File image) async {
-    final appDir = await syspaths.getApplicationDocumentsDirectory();
-    final fileName = path.basename(image.path);
-
-    final savedImage = await image.copy('${appDir.path}/$fileName');
-
-    setState(() {
-      _image = savedImage;
-    });
-  }
-
-  Future _handleSaveOrUpdate() async {
-    final isValid = _form.currentState.validate();
-    if (!isValid) return;
-
-    if (_image == null) return;
-
-    _form.currentState.save();
-
-    final categoryStore = Provider.of<CategoryStore>(context, listen: false);
-
-    final imageBytes = await _image.readAsBytes();
-
-    setState(() {
-      _model.categoryId = 1;
-      _model.base64 = base64Encode(imageBytes);
-      _loading = true;
-    });
-
-    bool result;
-    if (_isUpdate) {
-      result = await categoryStore.updateImage(ImageViewModel(
-        id: widget.image.id,
-        categoryId: _model.categoryId,
-        name: _model.name,
-        base64: _model.base64,
-      ));
-    } else {
-      result = await categoryStore.addImage(_model);
-    }
-
-    setState(() {
-      _loading = false;
-    });
-
-    if (result) {
-      Navigator.of(context).pop();
-    } else {
-      _scaffoldKey.currentState.showSnackBar(SnackBar(
-        content: Text('Erro ao enviar imagem'),
-        duration: Duration(seconds: 5),
-      ));
+      _handleInitialFileConfigurationAsync();
     }
   }
 
@@ -207,7 +78,7 @@ class _CreateUpdateImageState extends State<CreateUpdateImage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
                     GestureDetector(
-                      onTap: _handlePicture,
+                      onTap: _handlePictureAsync,
                       child: Container(
                         height: 100,
                         width: 100,
@@ -270,7 +141,7 @@ class _CreateUpdateImageState extends State<CreateUpdateImage> {
                   color: Theme.of(context).primaryColor,
                   elevation: 0,
                   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  onPressed: _handleSaveOrUpdate,
+                  onPressed: _handleSaveOrUpdateAsync,
                 ),
               ),
             )
@@ -278,5 +149,134 @@ class _CreateUpdateImageState extends State<CreateUpdateImage> {
         ),
       ),
     );
+  }
+
+  void _handleInitialFileConfigurationAsync() async {
+    final tempDir = await syspaths.getTemporaryDirectory();
+    final localDirectoryPath = '${tempDir.path}/tempDirectory';
+    final localImagePath = '$localDirectoryPath/${Uuid().v4()}.jpg';
+
+    resetDirectory(localDirectoryPath);
+    downloadFileAsync(localImagePath);
+  }
+
+  void downloadFileAsync(String localImagePath) async {
+    final localFile = File(localImagePath);
+
+    final response = await Dio().download(
+        '${ServicesConstants.CLOUDINARY_URL}/${widget.image.url}',
+        localImagePath);
+
+    if (response.statusCode != 200) return;
+
+    setState(() {
+      _isUpdate = true;
+      _nameController.text = widget.image.name;
+      _model.name = widget.image.name;
+      _image = localFile;
+    });
+  }
+
+  void resetDirectory(localDirectoryPath) {
+    final localDirectory = Directory(localDirectoryPath);
+    if (localDirectory.existsSync()) {
+      localDirectory.deleteSync(recursive: true);
+    }
+    localDirectory.createSync();
+  }
+
+  Future _handlePictureAsync() async {
+    final imageSource = await _chooseCaptureMethodAsync();
+    final image = await _takePictureAsync(imageSource);
+    if (image != null) {
+      await _saveLocalPictureAsync(image);
+    }
+  }
+
+  Future<ImageSource> _chooseCaptureMethodAsync() async {
+    return await showDialog<ImageSource>(
+        context: context,
+        builder: (_) {
+          return SimpleDialog(
+            title: Text('Escolha o modo',
+                style: TextStyle(
+                    fontSize: Theme.of(context).textTheme.headline6.fontSize)),
+            children: <Widget>[
+              SimpleDialogOption(
+                child: const Text('Galeria', style: TextStyle(fontSize: 16)),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 20, horizontal: 25),
+                onPressed: () => Navigator.of(context).pop(ImageSource.gallery),
+              ),
+              SimpleDialogOption(
+                child: const Text('Câmera', style: TextStyle(fontSize: 16)),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 20, horizontal: 25),
+                onPressed: () => Navigator.of(context).pop(ImageSource.camera),
+              ),
+            ],
+          );
+        });
+  }
+
+  Future _takePictureAsync(ImageSource imageSource) async {
+    return await ImagePicker.pickImage(
+      source: imageSource,
+      maxHeight: 200,
+    );
+  }
+
+  Future _saveLocalPictureAsync(File image) async {
+    final appDir = await syspaths.getApplicationDocumentsDirectory();
+    final fileName = path.basename(image.path);
+
+    final savedImage = await image.copy('${appDir.path}/$fileName');
+
+    setState(() {
+      _image = savedImage;
+    });
+  }
+
+  Future _handleSaveOrUpdateAsync() async {
+    final isValid = _form.currentState.validate();
+    if (!isValid) return;
+
+    if (_image == null) return;
+
+    _form.currentState.save();
+
+    final categoryStore = Provider.of<CategoryStore>(context, listen: false);
+
+    final imageBytes = await _image.readAsBytes();
+
+    setState(() {
+      _model.categoryId = 1;
+      _model.base64 = base64Encode(imageBytes);
+      _loading = true;
+    });
+
+    String response;
+    if (_isUpdate) {
+      response = await categoryStore.updateImageAsync(ImageViewModel(
+        id: widget.image.id,
+        categoryId: _model.categoryId,
+        name: _model.name,
+        base64: _model.base64,
+      ));
+    } else {
+      response = await categoryStore.addImageAsync(_model);
+    }
+
+    setState(() {
+      _loading = false;
+    });
+
+    if (response.isEmpty) {
+      Navigator.of(context).pop();
+    } else {
+      _scaffoldKey.currentState.showSnackBar(SnackBar(
+        content: Text("Categoria não encontrada"),
+      ));
+    }
   }
 }

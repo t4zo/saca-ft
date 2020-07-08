@@ -1,13 +1,12 @@
 import 'package:dio/dio.dart';
-
-import 'package:saca/settings.dart';
+import 'package:saca/constants/http.constants.dart';
 
 class HttpService {
   Dio _dio;
 
   HttpService() {
     _dio = Dio(BaseOptions(
-      baseUrl: API_URL,
+      baseUrl: HttpConstants.API_URL,
     ));
   }
 

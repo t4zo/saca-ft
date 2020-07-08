@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
+import 'package:saca/constants/services.constants.dart';
 import 'package:saca/models/image.model.dart' as Images;
 import 'package:saca/services/tts.service.dart';
-import 'package:saca/settings.dart';
 
 import 'package:saca/stores/user.store.dart';
 import 'package:saca/stores/category.store.dart';
@@ -18,50 +18,6 @@ class CategoriesView extends StatefulWidget {
 
 class _CategoriesViewState extends State<CategoriesView> {
   final _ttsService = TtsService();
-
-  Future _showBottomSheet([Images.Image image]) async {
-    if (image != null && image.categoryId != 1) return;
-    
-    return showModalBottomSheet(
-      context: context,
-      builder: (ctx) =>
-          image != null ? CreateUpdateImage(image: image) : CreateUpdateImage(),
-      isScrollControlled: true,
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(25.0))),
-    );
-  }
-
-  Future _handleLongPress(Images.Image image) async {
-    if (image.categoryId != 1) return;
-
-    await showDialog(
-        context: context,
-        builder: (ctx) => AlertDialog(
-              title: const Text('Remover Imagem'),
-              content: Text('Tem certeza que deseja remover `${image.name}`?'),
-              actions: <Widget>[
-                FlatButton(
-                  child: Text(
-                    'Voltar',
-                    style: TextStyle(
-                        color: Theme.of(context).textTheme.headline6.color),
-                  ),
-                  onPressed: () => Navigator.of(context).pop(),
-                ),
-                FlatButton(
-                    child: const Text(
-                      'Remover',
-                      style: TextStyle(color: Colors.red),
-                    ),
-                    onPressed: () async {
-                      await Provider.of<CategoryStore>(context, listen: false)
-                          .removeImage(image);
-                      Navigator.of(context).pop();
-                    })
-              ],
-            ));
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -108,15 +64,15 @@ class _CategoriesViewState extends State<CategoriesView> {
                                         vertical: 16),
                                     child: GestureDetector(
                                       onLongPress: () =>
-                                          _handleLongPress(image),
+                                          _handleLongPressAsync(image),
                                       onTap: () =>
                                           _ttsService.speak(image.name),
                                       onDoubleTap: () =>
-                                          _showBottomSheet(image),
+                                          _showBottomSheetAsync(image),
                                       child: Column(
                                         children: <Widget>[
                                           Image.network(
-                                              '$CLOUDINARY_URL/${image.fullyQualifiedPublicUrl}'),
+                                              '${ServicesConstants.CLOUDINARY_URL}/${image.fullyQualifiedPublicUrl}'),
                                           Text('${image.name}')
                                         ],
                                       ),
@@ -137,7 +93,7 @@ class _CategoriesViewState extends State<CategoriesView> {
         floatingActionButton: _userStore.isAuthenticated
             ? FloatingActionButton(
                 tooltip: 'Adicionar Imagem',
-                onPressed: _showBottomSheet,
+                onPressed: _showBottomSheetAsync,
                 backgroundColor: Theme.of(context).primaryColor,
                 child: Icon(
                   Icons.add,
@@ -148,5 +104,49 @@ class _CategoriesViewState extends State<CategoriesView> {
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       ),
     );
+  }
+
+  Future _showBottomSheetAsync([Images.Image image]) async {
+    if (image != null && image.categoryId != 1) return;
+
+    return showModalBottomSheet(
+      context: context,
+      builder: (ctx) =>
+          image != null ? CreateUpdateImage(image: image) : CreateUpdateImage(),
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(25.0))),
+    );
+  }
+
+  Future _handleLongPressAsync(Images.Image image) async {
+    if (image.categoryId != 1) return;
+
+    await showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+              title: const Text('Remover Imagem'),
+              content: Text('Tem certeza que deseja remover ${image.name}?'),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text(
+                    'Voltar',
+                    style: TextStyle(
+                        color: Theme.of(context).textTheme.headline6.color),
+                  ),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+                FlatButton(
+                    child: const Text(
+                      'Remover',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                    onPressed: () async {
+                      await Provider.of<CategoryStore>(context, listen: false)
+                          .removeImageAsync(image);
+                      Navigator.of(context).pop();
+                    })
+              ],
+            ));
   }
 }
