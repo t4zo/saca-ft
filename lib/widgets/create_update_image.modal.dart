@@ -78,7 +78,7 @@ class _CreateUpdateImageState extends State<CreateUpdateImage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
                     GestureDetector(
-                      onTap: _handlePictureAsync,
+                      onTap: _handleImageAsync,
                       child: Container(
                         height: 100,
                         width: 100,
@@ -185,11 +185,11 @@ class _CreateUpdateImageState extends State<CreateUpdateImage> {
     localDirectory.createSync();
   }
 
-  Future _handlePictureAsync() async {
+  Future _handleImageAsync() async {
     final imageSource = await _chooseCaptureMethodAsync();
-    final image = await _takePictureAsync(imageSource);
+    final image = await _takeImageAsync(imageSource);
     if (image != null) {
-      await _saveLocalPictureAsync(image);
+      await _saveLocalImageAsync(image);
     }
   }
 
@@ -219,14 +219,14 @@ class _CreateUpdateImageState extends State<CreateUpdateImage> {
         });
   }
 
-  Future _takePictureAsync(ImageSource imageSource) async {
-    return await ImagePicker.pickImage(
+  Future _takeImageAsync(ImageSource imageSource) async {
+    return await ImagePicker().getImage(
       source: imageSource,
       maxHeight: 200,
     );
   }
 
-  Future _saveLocalPictureAsync(File image) async {
+  Future _saveLocalImageAsync(File image) async {
     final appDir = await syspaths.getApplicationDocumentsDirectory();
     final fileName = path.basename(image.path);
 

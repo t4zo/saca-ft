@@ -57,7 +57,7 @@ class Saca extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.purple,
-        accentColor: Colors.white,
+        accentColor: Colors.yellow,
         errorColor: Colors.red,
         fontFamily: 'Quicksand',
         appBarTheme: AppBarTheme(

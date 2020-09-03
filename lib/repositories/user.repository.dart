@@ -39,8 +39,8 @@ class UserRepository {
     }
   }
 
-  Future<HttpResponse<bool>> signUp(SignUpViewModel model) async {
-    model.roles = ['usuario'];
+  Future<HttpResponse<User>> signUp(SignUpViewModel model) async {
+    model.roles = ['User'];
 
     try {
       Response response = await _httpService.dio.post('', data: {
@@ -52,7 +52,8 @@ class UserRepository {
       });
 
       if (response.statusCode == 200) {
-        return HttpResponse(response: true);
+        final user = User.fromJson(response.data['user']);
+        return HttpResponse(response: user);
       }
 
       return HttpResponse(

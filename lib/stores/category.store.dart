@@ -37,15 +37,25 @@ abstract class _CategoryStore with Store {
   List<CategoryViewModel> get categories => [..._categories];
 
   @action
-  void setCategories(List<CategoryViewModel> categories) {
-    _categories = categories;
-  }
-
-  @action
   void toggleExpanded(int index, bool isExpanded) {
     List<CategoryViewModel> newCategories = categories;
     newCategories[index].isExpanded = !isExpanded;
     _categories = newCategories;
+  }
+
+  @action
+  Future<String> getAllAsync() async {
+    List<Category> categories;
+
+    final http = await _categoryRepository.getAllAsync(_userStore.user);
+    if (http.error != null) return http.errorMessage;
+
+    categories = http.response;
+
+    final cvm = CategoryViewModel.fromCategoryList(categories);
+    _categories = cvm;
+
+    return "";
   }
 
   @action
@@ -63,21 +73,19 @@ abstract class _CategoryStore with Store {
 
   @action
   Future<String> addImageAsync(ImageViewModel imageViewModel) async {
-    final http = await _imageRepository.createAsync(_userStore.user, imageViewModel);
-
+    final http =
+        await _imageRepository.createAsync(_userStore.user, imageViewModel);
     if (http.error != null) return http.errorMessage;
 
     final image = http.response;
-    if (image == null) return "Imagem não encontrada";
 
     final newCategories = categories;
     final category =
         newCategories.firstWhere((category) => category.id == image.categoryId);
 
     final index = newCategories.indexOf(category);
-    if (index == -1) return "Categoria não encontrada";
-
-    newCategories[index].images.add(image);
+    newCategories[index].images = [...newCategories[index].images, image];
+    
     _categories = newCategories;
 
     return "";
@@ -89,7 +97,6 @@ abstract class _CategoryStore with Store {
     if (http.error != null) return http.errorMessage;
 
     final updatedImage = http.response;
-    if (updatedImage == null) return "Imagem não encontrada";
 
     final newCategories = categories;
     final category = newCategories
@@ -106,7 +113,7 @@ abstract class _CategoryStore with Store {
     newCategories[categoryIndex].images[imageIndex] = updatedImage;
 
     _categories = newCategories;
-
+    
     return "";
   }
 
@@ -114,9 +121,6 @@ abstract class _CategoryStore with Store {
   Future<String> removeImageAsync(Image image) async {
     final http = await _imageRepository.removeAsync(_userStore.user, image);
     if (http.error != null) return http.errorMessage;
-
-    final _image = await _imageRepository.removeAsync(_userStore.user, image);
-    if (_image == null) return "Imagem não encontrada";
 
     final newCategories = categories;
     final category =
@@ -126,31 +130,8 @@ abstract class _CategoryStore with Store {
     if (index == -1) return "Categoria não encontrada";
 
     newCategories[index].images.removeWhere((i) => i.id == image.id);
+    
     _categories = newCategories;
-
-    return "";
-  }
-
-  @action
-  Future<String> getAllAsync() async {
-    List<Category> categories;
-
-    if (!_userStore.isAuthenticated) {
-      final http = await _categoryRepository.getAllHomeAsync();
-
-      if (http.error != null) return http.errorMessage;
-
-      categories = http.response;
-    } else {
-      final http = await _categoryRepository.getAllAsync(_userStore.user);
-
-      if (http.error != null) return http.errorMessage;
-
-      categories = http.response;
-    }
-
-    final cvm = CategoryViewModel.fromCategoryList(categories);
-    setCategories(cvm);
 
     return "";
   }

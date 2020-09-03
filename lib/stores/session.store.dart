@@ -55,6 +55,7 @@ abstract class _SessionStore with Store {
     if(http.error != null) return http.errorMessage;
     
     _userStore.setUser(http.response);
+    setSessionAsync();
     return "";
   }
 
@@ -63,6 +64,8 @@ abstract class _SessionStore with Store {
     final http = await _userRepository.signUp(model);
     if(http.error != null) return http.errorMessage;
 
+    _userStore.setUser(http.response);
+    setSessionAsync();
     return "";
   }
 
@@ -111,6 +114,8 @@ abstract class _SessionStore with Store {
     User user = User.fromJson(session['user']);
     _token = user.token;
     _expiryDate = DateTime.parse(session['expiryDate']);
+
+    _userStore.setUser(user);
 
     _autoLogout();
     return user;

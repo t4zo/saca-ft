@@ -25,8 +25,8 @@ class _TabsScreenState extends State<TabsScreen> {
     super.initState();
     setState(() {
       _screens = [
-        {'screen': CategoriesView(), 'title': 'Categorias'},
         {'screen': ImagesView(), 'title': 'Imagens'},
+        {'screen': CategoriesView(), 'title': 'Categorias'},
         {'screen': SignInView(), 'title': 'Entrar'},
         {'screen': SignUpView(), 'title': 'Registrar'},
       ];
@@ -71,13 +71,13 @@ class _TabsScreenState extends State<TabsScreen> {
           items: [
             BottomNavigationBarItem(
               backgroundColor: Theme.of(context).primaryColor,
-              icon: Icon(Icons.category),
-              title: Text('Categorias'),
+              icon: Icon(Icons.image),
+              title: Text('Imagens'),
             ),
             BottomNavigationBarItem(
               backgroundColor: Theme.of(context).primaryColor,
-              icon: Icon(Icons.image),
-              title: Text('Imagens'),
+              icon: Icon(Icons.category),
+              title: Text('Categorias'),
             ),
             BottomNavigationBarItem(
               backgroundColor: Theme.of(context).primaryColor,
