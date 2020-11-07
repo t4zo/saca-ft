@@ -219,18 +219,18 @@ class _CreateUpdateImageState extends State<CreateUpdateImage> {
         });
   }
 
-  Future _takeImageAsync(ImageSource imageSource) async {
+  Future<PickedFile> _takeImageAsync(ImageSource imageSource) async {
     return await ImagePicker().getImage(
       source: imageSource,
       maxHeight: 200,
     );
   }
 
-  Future _saveLocalImageAsync(File image) async {
+  Future _saveLocalImageAsync(PickedFile image) async {
     final appDir = await syspaths.getApplicationDocumentsDirectory();
     final fileName = path.basename(image.path);
 
-    final savedImage = await image.copy('${appDir.path}/$fileName');
+    final savedImage = await File(image.path).copy('${appDir.path}/$fileName');
 
     setState(() {
       _image = savedImage;

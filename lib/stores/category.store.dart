@@ -1,5 +1,4 @@
 import 'package:mobx/mobx.dart';
-import 'package:saca/models/category.model.dart';
 import 'package:saca/models/image.model.dart';
 import 'package:saca/repositories/category.repository.dart';
 import 'package:saca/repositories/image.repository.dart';
@@ -28,13 +27,27 @@ abstract class _CategoryStore with Store {
   final ImageRepository _imageRepository;
 
   @observable
-  List<CategoryViewModel> _categories = [];
+  Iterable<CategoryViewModel> _categories = [];
 
   _CategoryStore(
       this._userStore, this._categoryRepository, this._imageRepository);
 
   @computed
   List<CategoryViewModel> get categories => [..._categories];
+
+  @computed
+  List<Image> get images {
+    List<Image> imgs = [];
+    // return _categories.map((category) => category.images);
+
+    categories.forEach((category) {
+      category.images.forEach((img) {
+        imgs.add(img);
+      });
+    });
+
+    return imgs;
+  }
 
   @action
   void toggleExpanded(int index, bool isExpanded) {
@@ -45,30 +58,13 @@ abstract class _CategoryStore with Store {
 
   @action
   Future<String> getAllAsync() async {
-    List<Category> categories;
-
     final http = await _categoryRepository.getAllAsync(_userStore.user);
     if (http.error != null) return http.errorMessage;
 
-    categories = http.response;
-
-    final cvm = CategoryViewModel.fromCategoryList(categories);
-    _categories = cvm;
+    final categories = http.response;
+    _categories = CategoryViewModel.fromCategoryList(categories).toList();
 
     return "";
-  }
-
-  @action
-  List<Image> getAllImages() {
-    List<Image> images = [];
-    // return _categories.map((category) => category.images);
-    categories.forEach((category) {
-      category.images.forEach((image) {
-        images.add(image);
-      });
-    });
-
-    return images;
   }
 
   @action
@@ -85,7 +81,7 @@ abstract class _CategoryStore with Store {
 
     final index = newCategories.indexOf(category);
     newCategories[index].images = [...newCategories[index].images, image];
-    
+
     _categories = newCategories;
 
     return "";
@@ -113,7 +109,7 @@ abstract class _CategoryStore with Store {
     newCategories[categoryIndex].images[imageIndex] = updatedImage;
 
     _categories = newCategories;
-    
+
     return "";
   }
 
@@ -130,7 +126,7 @@ abstract class _CategoryStore with Store {
     if (index == -1) return "Categoria não encontrada";
 
     newCategories[index].images.removeWhere((i) => i.id == image.id);
-    
+
     _categories = newCategories;
 
     return "";

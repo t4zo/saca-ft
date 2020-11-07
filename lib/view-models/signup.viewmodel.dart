@@ -13,12 +13,20 @@ class SignUpViewModel {
     this.roles,
   });
 
+  SignUpViewModel.empty() {
+    this.username = '';
+    this.email = '';
+    this.password = '';
+    this.confirmPassword = '';
+    this.roles = [''];
+  }
+
   SignUpViewModel.fromJson(Map<String, dynamic> json) {
-    username = json['username'];
-    email = json['email'];
-    password = json['password'];
-    confirmPassword = json['confirmPassword'];
-    roles = json['roles'].cast<String>();
+    this.username = json['username'];
+    this.email = json['email'];
+    this.password = json['password'];
+    this.confirmPassword = json['confirmPassword'];
+    this.roles = json['roles'].cast<String>();
   }
 
   Map<String, dynamic> toJson() {

@@ -1,16 +1,23 @@
 class SignInViewModel {
   String email;
   String password;
-  bool remember = false;
-  bool busy = false;
+  bool remember;
+  bool busy;
 
   SignInViewModel({this.email, this.password, this.remember, this.busy});
 
+  SignInViewModel.empty(Map<String, dynamic> json) {
+    this.email = '';
+    this.password = '';
+    this.remember = false;
+    this.busy = false;
+  }
+
   SignInViewModel.fromJson(Map<String, dynamic> json) {
-    email = json['email'];
-    password = json['password'];
-    remember = json['remember'];
-    busy = json['remember'];
+    this.email = json['email'];
+    this.password = json['password'];
+    this.remember = json['remember'];
+    this.busy = json['remember'];
   }
 
   Map<String, dynamic> toJson() {

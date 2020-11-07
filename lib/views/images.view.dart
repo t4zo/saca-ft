@@ -33,7 +33,6 @@ class _ImagesViewState extends State<ImagesView> {
                 );
               }
               return Observer(builder: (_) {
-                final images = _categoryStore.getAllImages();
                 return RefreshIndicator(
                   onRefresh: _categoryStore.getAllAsync,
                   child: GridView.builder(
@@ -44,16 +43,16 @@ class _ImagesViewState extends State<ImagesView> {
                       mainAxisSpacing: 20,
                       crossAxisSpacing: 1,
                     ),
-                    itemCount: images.length,
+                    itemCount: _categoryStore.images.length,
                     itemBuilder: (ctx, i) => ClipRRect(
                       borderRadius: BorderRadius.circular(10),
                       child: GestureDetector(
-                        onLongPress: () => _handleLongPressAsync(images[i]),
-                        onTap: () => _ttsService.speak(images[i].name),
-                        onDoubleTap: () => _showBottomSheetAsync(images[i]),
+                        onLongPress: () => _handleLongPressAsync(_categoryStore.images[i]),
+                        onTap: () => _ttsService.speak(_categoryStore.images[i].name),
+                        onDoubleTap: () => _showBottomSheetAsync(_categoryStore.images[i]),
                         child: GridTile(
                           child: Image.network(
-                              '${ServicesConstants.CLOUDINARY_URL}/${images[i].url}'),
+                              '${ServicesConstants.CLOUDINARY_URL}/${_categoryStore.images[i].url}'),
                           footer: LayoutBuilder(
                             builder: (BuildContext context,
                                     BoxConstraints constraints) =>
@@ -65,7 +64,7 @@ class _ImagesViewState extends State<ImagesView> {
                                 width: constraints.maxWidth,
                                 // decoration: BoxDecoration(borderRadius: const BorderRadius.vertical(top: Radius.circular(10))),
                                 child: Text(
-                                  '${images[i].name}',
+                                  '${_categoryStore.images[i].name}',
                                   style: TextStyle(color: Colors.black),
                                   textAlign: TextAlign.center,
                                   softWrap: true,

@@ -16,17 +16,24 @@ mixin _$CategoryStore on _CategoryStore, Store {
           Computed<List<CategoryViewModel>>(() => super.categories,
               name: '_CategoryStore.categories'))
       .value;
+  Computed<List<Image>> _$imagesComputed;
+
+  @override
+  List<Image> get images =>
+      (_$imagesComputed ??= Computed<List<Image>>(() => super.images,
+              name: '_CategoryStore.images'))
+          .value;
 
   final _$_categoriesAtom = Atom(name: '_CategoryStore._categories');
 
   @override
-  List<CategoryViewModel> get _categories {
+  Iterable<CategoryViewModel> get _categories {
     _$_categoriesAtom.reportRead();
     return super._categories;
   }
 
   @override
-  set _categories(List<CategoryViewModel> value) {
+  set _categories(Iterable<CategoryViewModel> value) {
     _$_categoriesAtom.reportWrite(value, super._categories, () {
       super._categories = value;
     });
@@ -81,20 +88,10 @@ mixin _$CategoryStore on _CategoryStore, Store {
   }
 
   @override
-  List<Image> getAllImages() {
-    final _$actionInfo = _$_CategoryStoreActionController.startAction(
-        name: '_CategoryStore.getAllImages');
-    try {
-      return super.getAllImages();
-    } finally {
-      _$_CategoryStoreActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
   String toString() {
     return '''
-categories: ${categories}
+categories: ${categories},
+images: ${images}
     ''';
   }
 }
