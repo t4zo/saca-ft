@@ -151,10 +151,9 @@ class _SignUpScreenView extends State<SignUpView> {
                             return Navigator.pushNamed(
                                 context, CategoriesView.routeName);
                           } else {
-                            return Future.value(Container(
-                              width: 0,
-                              height: 0,
-                            ));
+                            return Future.value(
+                              Container(width: 0, height: 0),
+                            );
                           }
                         }),
                   ),
@@ -176,7 +175,7 @@ class _SignUpScreenView extends State<SignUpView> {
     final sessionStore = Provider.of<SessionStore>(context, listen: false);
     final response = await sessionStore.signUpAsync(signUpViewModel);
     if (response.isEmpty) {
-      await sessionStore.authenticateAsync(SignInViewModel(
+      await sessionStore.signInAsync(SignInViewModel(
           email: signUpViewModel.email, password: signUpViewModel.password));
     } else {
       Scaffold.of(context).showSnackBar(SnackBar(content: Text(response)));

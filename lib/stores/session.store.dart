@@ -50,8 +50,8 @@ abstract class _SessionStore with Store {
   }
 
   @action
-  Future<String> authenticateAsync(SignInViewModel signInViewModel) async {
-    final http = await _userRepository.authenticateAsync(signInViewModel);
+  Future<String> signInAsync(SignInViewModel signInViewModel) async {
+    final http = await _userRepository.signInAsync(signInViewModel);
     if(http.error != null) return http.errorMessage;
     
     _userStore.setUser(http.response);

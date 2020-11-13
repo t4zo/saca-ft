@@ -73,18 +73,21 @@ abstract class _CategoryStore with Store {
         await _imageRepository.createAsync(_userStore.user, imageViewModel);
     if (http.error != null) return http.errorMessage;
 
-    final image = http.response;
+    return await getAllAsync();
 
-    final newCategories = categories;
-    final category =
-        newCategories.firstWhere((category) => category.id == image.categoryId);
+    // Without fetching all images again
+    // final image = http.response;
 
-    final index = newCategories.indexOf(category);
-    newCategories[index].images = [...newCategories[index].images, image];
+    // // final newCategories = categories;
+    // // // final category =
+    // // //     newCategories.firstWhere((category) => category.id == image.categoryId);
 
-    _categories = newCategories;
+    // // // final index = newCategories.indexOf(category);
+    // // // newCategories[index].images = [...newCategories[index].images, image];
 
-    return "";
+    // // // _categories = newCategories;
+
+    // return "";
   }
 
   @action
@@ -92,25 +95,28 @@ abstract class _CategoryStore with Store {
     final http = await _imageRepository.updateAsync(_userStore.user, image);
     if (http.error != null) return http.errorMessage;
 
-    final updatedImage = http.response;
+    return await getAllAsync();
 
-    final newCategories = categories;
-    final category = newCategories
-        .firstWhere((category) => category.id == updatedImage.categoryId);
+    // Without fetching all images again
+    // final updatedImage = http.response;
 
-    final categoryIndex = newCategories.indexOf(category);
-    if (categoryIndex == -1) return "Categoria não encontrada";
+    // final newCategories = categories;
+    // final category = newCategories
+    //     .firstWhere((category) => category.id == updatedImage.categoryId);
 
-    final _image =
-        newCategories[categoryIndex].images.firstWhere((i) => i.id == image.id);
+    // final categoryIndex = newCategories.indexOf(category);
+    // if (categoryIndex == -1) return "Categoria não encontrada";
 
-    final imageIndex = newCategories[categoryIndex].images.indexOf(_image);
+    // final _image =
+    //     newCategories[categoryIndex].images.firstWhere((i) => i.id == image.id);
 
-    newCategories[categoryIndex].images[imageIndex] = updatedImage;
+    // final imageIndex = newCategories[categoryIndex].images.indexOf(_image);
 
-    _categories = newCategories;
+    // newCategories[categoryIndex].images[imageIndex] = updatedImage;
 
-    return "";
+    // _categories = newCategories;
+
+    // return "";
   }
 
   @action
@@ -118,17 +124,20 @@ abstract class _CategoryStore with Store {
     final http = await _imageRepository.removeAsync(_userStore.user, image);
     if (http.error != null) return http.errorMessage;
 
-    final newCategories = categories;
-    final category =
-        newCategories.firstWhere((category) => category.id == image.categoryId);
+    return await getAllAsync();
 
-    final index = newCategories.indexOf(category);
-    if (index == -1) return "Categoria não encontrada";
+    // Without fetching all images again
+    // final newCategories = categories;
+    // final category =
+    //     newCategories.firstWhere((category) => category.id == image.categoryId);
 
-    newCategories[index].images.removeWhere((i) => i.id == image.id);
+    // final index = newCategories.indexOf(category);
+    // if (index == -1) return "Categoria não encontrada";
 
-    _categories = newCategories;
+    // newCategories[index].images.removeWhere((i) => i.id == image.id);
 
-    return "";
+    // _categories = newCategories;
+
+    // return "";
   }
 }

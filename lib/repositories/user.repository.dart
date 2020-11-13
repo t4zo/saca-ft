@@ -18,12 +18,12 @@ class UserRepository {
     _httpService.dio.options.baseUrl += '/auth';
   }
 
-  Future<HttpResponse<User>> authenticateAsync(SignInViewModel model) async {
+  Future<HttpResponse<User>> signInAsync(SignInViewModel model) async {
     model.remember = false;
 
     try {
       Response response =
-          await _httpService.dio.post('/authenticate', data: model);
+          await _httpService.dio.post('/signin', data: model);
 
       if (response.statusCode == 200) {
         final user = User.fromJson(response.data['user']);
@@ -32,10 +32,10 @@ class UserRepository {
 
       return HttpResponse(error: DioError(error: HttpConstants.CODE_NOT_200));
     } on DioError catch (error) {
-      // final errorMessage = json.decode(error.response.data)['detail'];
-      final errorResponse = json.decode(error.response.data)['errors'] as Map<String, dynamic>;
-      final errorField = errorResponse.entries.first;
-      return HttpResponse(error: error, errorMessage: errorField.value.first);
+      // final errorResponse = json.decode(error.response.data)['errors'] as Map<String, dynamic>;
+      // final errorField = errorResponse.entries.first;
+      final errorMessage = json.decode(error.response.data)['detail'];
+      return HttpResponse(error: error, errorMessage: errorMessage);
     }
   }
 
@@ -60,9 +60,10 @@ class UserRepository {
           error: DioError(error: HttpConstants.CODE_NOT_200),
           errorMessage: FieldConstants.INVALID);
     } on DioError catch (error) {
-      final errorResponse = json.decode(error.response.data)['errors'] as Map<String, dynamic>;
-      final errorField = errorResponse.entries.first;
-      return HttpResponse(error: error, errorMessage: errorField.value.first);
+      // final errorResponse = json.decode(error.response.data)['detail'] as Map<String, dynamic>;
+      // final errorField = errorResponse.entries.first;
+      final errorMessage = json.decode(error.response.data)['detail'];
+      return HttpResponse(error: error, errorMessage: errorMessage);
     }
   }
 }

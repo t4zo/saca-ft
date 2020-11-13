@@ -75,13 +75,12 @@ mixin _$SessionStore on _SessionStore, Store {
     });
   }
 
-  final _$authenticateAsyncAsyncAction =
-      AsyncAction('_SessionStore.authenticateAsync');
+  final _$signInAsyncAsyncAction = AsyncAction('_SessionStore.signInAsync');
 
   @override
-  Future<String> authenticateAsync(SignInViewModel signInViewModel) {
-    return _$authenticateAsyncAsyncAction
-        .run(() => super.authenticateAsync(signInViewModel));
+  Future<String> signInAsync(SignInViewModel signInViewModel) {
+    return _$signInAsyncAsyncAction
+        .run(() => super.signInAsync(signInViewModel));
   }
 
   final _$signUpAsyncAsyncAction = AsyncAction('_SessionStore.signUpAsync');

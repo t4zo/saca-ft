@@ -52,47 +52,48 @@ class _TabsScreenState extends State<TabsScreen> {
     final _userStore = Provider.of<UserStore>(context, listen: false);
 
     return Scaffold(
-      // appBar: AppBar(
-      //   title: Text(_screens[_selectScreenIndex]['title']),
-      // ),
       body: PageView(
         controller: _pageController,
         onPageChanged: (index) => _selectScreen(index),
         children: _screens.map((screen) => screen['screen'] as Widget).toList(),
       ),
-      bottomNavigationBar: Observer(
-        builder: (_) => BottomNavigationBar(
-          backgroundColor: Theme.of(context).primaryColor,
-          selectedItemColor: Theme.of(context).accentColor,
-          unselectedItemColor: Colors.white,
-          onTap: (index) => _bottomTapped(index),
-          currentIndex: _selectScreenIndex,
-          type: BottomNavigationBarType.fixed,
-          items: [
-            BottomNavigationBarItem(
+      bottomNavigationBar: Container(
+        child: Observer(
+          builder: (_) => Container(
+            child: BottomNavigationBar(
               backgroundColor: Theme.of(context).primaryColor,
-              icon: Icon(Icons.image),
-              title: Text('Imagens'),
+              selectedItemColor: Theme.of(context).accentColor,
+              unselectedItemColor: Colors.white,
+              onTap: (index) => _bottomTapped(index),
+              currentIndex: _selectScreenIndex,
+              type: BottomNavigationBarType.fixed,
+              items: [
+                BottomNavigationBarItem(
+                  backgroundColor: Theme.of(context).primaryColor,
+                  icon: Icon(Icons.image),
+                  title: Text('Imagens'),
+                ),
+                BottomNavigationBarItem(
+                  backgroundColor: Theme.of(context).primaryColor,
+                  icon: Icon(Icons.category),
+                  title: Text('Categorias'),
+                ),
+                BottomNavigationBarItem(
+                  backgroundColor: Theme.of(context).primaryColor,
+                  icon: Icon(!_userStore.isAuthenticated
+                      ? Icons.supervisor_account
+                      : Icons.exit_to_app),
+                  title: Text(!_userStore.isAuthenticated ? 'Entrar' : 'Sair'),
+                ),
+                // if (!_userStore.isAuthenticated)
+                  BottomNavigationBarItem(
+                    backgroundColor: Theme.of(context).primaryColor,
+                    icon: Icon(Icons.perm_identity),
+                    title: Text('Registrar'),
+                  ),
+              ],
             ),
-            BottomNavigationBarItem(
-              backgroundColor: Theme.of(context).primaryColor,
-              icon: Icon(Icons.category),
-              title: Text('Categorias'),
-            ),
-            BottomNavigationBarItem(
-              backgroundColor: Theme.of(context).primaryColor,
-              icon: Icon(!_userStore.isAuthenticated
-                  ? Icons.supervisor_account
-                  : Icons.exit_to_app),
-              title: Text(!_userStore.isAuthenticated ? 'Entrar' : 'Sair'),
-            ),
-            if (!_userStore.isAuthenticated)
-              BottomNavigationBarItem(
-                backgroundColor: Theme.of(context).primaryColor,
-                icon: Icon(Icons.perm_identity),
-                title: Text('Registrar'),
-              ),
-          ],
+          ),
         ),
       ),
     );

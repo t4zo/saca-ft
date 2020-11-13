@@ -167,8 +167,10 @@ class _SignInViewState extends State<SignInView> {
 
     _form.currentState.save();
 
-    return Provider.of<SessionStore>(context, listen: false)
-        .authenticateAsync(signInViewModel);
+    final result = await Provider.of<SessionStore>(context, listen: false)
+        .signInAsync(signInViewModel);
+    
+    return result;
   }
 
   Future _handleSignInAndSignOutAsync() async {
