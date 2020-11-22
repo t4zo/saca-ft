@@ -9,6 +9,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart' as syspaths;
 import 'package:provider/provider.dart';
+import 'package:saca/constants/application.constants.dart';
 import 'package:saca/constants/services.constants.dart';
 import 'package:saca/stores/category.store.dart';
 import 'package:saca/view-models/image.viewmodel.dart';
@@ -250,7 +251,7 @@ class _CreateUpdateImageState extends State<CreateUpdateImage> {
     final imageBytes = await _image.readAsBytes();
 
     setState(() {
-      _model.categoryId = 1;
+      _model.categoryId = ApplicationConstants.categorialPessoalId;
       _model.base64 = base64Encode(imageBytes);
       _loading = true;
     });

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
+import 'package:saca/constants/application.constants.dart';
 import 'package:saca/constants/services.constants.dart';
 import 'package:saca/models/image.model.dart' as Images;
 import 'package:saca/services/tts.service.dart';
@@ -104,7 +105,7 @@ class _CategoriesViewState extends State<CategoriesView> {
   }
 
   Future _showBottomSheetAsync([Images.Image image]) async {
-    if (image != null && image.categoryId != 1) return;
+    if (image != null && image.categoryId != ApplicationConstants.categorialPessoalId) return;
 
     return showModalBottomSheet(
       context: context,
@@ -117,7 +118,7 @@ class _CategoriesViewState extends State<CategoriesView> {
   }
 
   Future _handleLongPressAsync(Images.Image image) async {
-    if (image.categoryId != 1) return;
+    if (image.categoryId != ApplicationConstants.categorialPessoalId) return;
 
     await showDialog(
         context: context,
