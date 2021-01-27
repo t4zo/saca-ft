@@ -12,29 +12,29 @@ class HttpService {
       responseType: ResponseType.json,
       contentType: ContentType.json.toString(),
     ));
-      // ..interceptors.add(
-        // InterceptorsWrapper(onRequest: (RequestOptions requestOptions) async {
-        //   dio.interceptors.requestLock.lock();
+    // ..interceptors.add(
+    // InterceptorsWrapper(onRequest: (RequestOptions requestOptions) async {
+    //   dio.interceptors.requestLock.lock();
 
-        //   final preferences = await SharedPreferences.getInstance();
-        //   if (!preferences.containsKey('@session')) {
-        //     dio.interceptors.requestLock.unlock();
-        //     return requestOptions;
-        //   }
+    //   final preferences = await SharedPreferences.getInstance();
+    //   if (!preferences.containsKey('@session')) {
+    //     dio.interceptors.requestLock.unlock();
+    //     return requestOptions;
+    //   }
 
-        //   final session = json.decode(preferences.getString('@session'))
-        //       as Map<String, Object>;
-        //   User user = User.fromJson(session['user']);
+    //   final session = json.decode(preferences.getString('@session'))
+    //       as Map<String, Object>;
+    //   User user = User.fromJson(session['user']);
 
-        //   if (user.token != null) {
-        //     dio.options.headers[HttpHeaders.authorizationHeader] =
-        //         'Bearer ' + user.token;
-        //   }
+    //   if (user.token != null) {
+    //     dio.options.headers[HttpHeaders.authorizationHeader] =
+    //         'Bearer ' + user.token;
+    //   }
 
-        //   dio.interceptors.requestLock.unlock();
-        //   return requestOptions;
-        // }),
-      // );
+    //   dio.interceptors.requestLock.unlock();
+    //   return requestOptions;
+    // }),
+    // );
   }
 
   Dio get dio => _dio;

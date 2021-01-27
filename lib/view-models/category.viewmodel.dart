@@ -15,7 +15,7 @@ class CategoryViewModel {
     this.images = [Image()];
     this.isExpanded = false;
   }
-  
+
   CategoryViewModel.fromCategory(Category category) {
     this.id = category.id;
     this.name = category.name;

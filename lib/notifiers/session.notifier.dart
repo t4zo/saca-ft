@@ -27,8 +27,7 @@ class SessionStore extends StateNotifier<SessionState> {
   final UserStateNotifier _userStateNotifier;
   final UserRepository _userRepository;
 
-  SessionStore(this._userStateNotifier, this._userRepository)
-      : super(SessionState.empty());
+  SessionStore(this._userStateNotifier, this._userRepository) : super(SessionState.empty());
 
   void _autoLogout() {
     final _timeToExpiry = state.expiryDate.difference(DateTime.now()).inSeconds;
@@ -41,8 +40,8 @@ class SessionStore extends StateNotifier<SessionState> {
 
   Future<String> signInAsync(SignInViewModel signInViewModel) async {
     final http = await _userRepository.signInAsync(signInViewModel);
-    if(http.error != null) return http.errorMessage;
-    
+    if (http.error != null) return http.errorMessage;
+
     _userStateNotifier.setUser(http.response);
     setSessionAsync();
     return "";
@@ -50,7 +49,7 @@ class SessionStore extends StateNotifier<SessionState> {
 
   Future<String> signUpAsync(SignUpViewModel model) async {
     final http = await _userRepository.signUp(model);
-    if(http.error != null) return http.errorMessage;
+    if (http.error != null) return http.errorMessage;
 
     _userStateNotifier.setUser(http.response);
     setSessionAsync();
@@ -72,7 +71,8 @@ class SessionStore extends StateNotifier<SessionState> {
     preferences.setString(
         '@session',
         json.encode(
-            {'user': user, 'expiryDate': expiryDate.toIso8601String()}));
+          {'user': user, 'expiryDate': expiryDate.toIso8601String()},
+        ));
 
     state = SessionState(token: token, expiryDate: expiryDate);
   }
@@ -91,8 +91,7 @@ class SessionStore extends StateNotifier<SessionState> {
     final preferences = await SharedPreferences.getInstance();
     if (!preferences.containsKey('@session')) return null;
 
-    final session =
-        json.decode(preferences.getString('@session')) as Map<String, Object>;
+    final session = json.decode(preferences.getString('@session')) as Map<String, Object>;
     final _expiryDate = DateTime.parse(session['expiryDate']);
 
     if (_expiryDate.isBefore(DateTime.now())) return null;

@@ -17,8 +17,7 @@ class ImageRepository {
     _httpService.dio.options.baseUrl += '/images';
   }
 
-  Future<HttpResponse<Image>> createAsync(
-      User user, ImageViewModel imageViewModel) async {
+  Future<HttpResponse<Image>> createAsync(User user, ImageViewModel imageViewModel) async {
     try {
       imageViewModel.id = 0;
 
@@ -26,11 +25,12 @@ class ImageRepository {
           data: {
             'name': imageViewModel.name,
             'categoryId': imageViewModel.categoryId,
-            'base64': imageViewModel.base64
+            'base64': imageViewModel.base64,
           },
-          options: Options(contentType: ContentType.json.mimeType, headers: {
-            HttpHeaders.authorizationHeader: 'Bearer ${user.token}'
-          }));
+          options: Options(
+            contentType: ContentType.json.mimeType,
+            headers: {HttpHeaders.authorizationHeader: 'Bearer ${user.token}'},
+          ));
 
       if (response.statusCode == 200) {
         return HttpResponse(response: Image.fromJson(response.data));
@@ -42,14 +42,14 @@ class ImageRepository {
     }
   }
 
-  Future<HttpResponse<Image>> updateAsync(
-      User user, ImageViewModel imageViewModel) async {
+  Future<HttpResponse<Image>> updateAsync(User user, ImageViewModel imageViewModel) async {
     try {
       final response = await _httpService.dio.put('/${imageViewModel.id}',
           data: imageViewModel,
-          options: Options(contentType: ContentType.json.mimeType, headers: {
-            HttpHeaders.authorizationHeader: 'Bearer ${user.token}'
-          }));
+          options: Options(
+            contentType: ContentType.json.mimeType,
+            headers: {HttpHeaders.authorizationHeader: 'Bearer ${user.token}'},
+          ));
 
       if (response.statusCode == 200) {
         return HttpResponse(response: Image.fromJson(response.data));
@@ -64,9 +64,10 @@ class ImageRepository {
   Future<HttpResponse<Image>> removeAsync(User user, Image image) async {
     try {
       final response = await _httpService.dio.delete('/${image.id}',
-          options: Options(contentType: ContentType.json.mimeType, headers: {
-            HttpHeaders.authorizationHeader: 'Bearer ${user.token}'
-          }));
+          options: Options(
+            contentType: ContentType.json.mimeType,
+            headers: {HttpHeaders.authorizationHeader: 'Bearer ${user.token}'},
+          ));
 
       if (response.statusCode == 200) {
         return HttpResponse(response: Image.fromJson(response.data));

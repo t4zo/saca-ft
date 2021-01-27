@@ -5,5 +5,5 @@ class HttpResponse<T> {
   DioError error;
   String errorMessage;
 
-  HttpResponse({ this.response, this.error, this.errorMessage });
+  HttpResponse({this.response, this.error, this.errorMessage});
 }

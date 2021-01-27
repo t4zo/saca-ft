@@ -11,8 +11,7 @@ class MyHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext context) {
     HttpClient client = super.createHttpClient(context);
-    client.badCertificateCallback =
-        (X509Certificate cert, String host, int port) => true;
+    client.badCertificateCallback = (X509Certificate cert, String host, int port) => true;
     return client;
   }
 }
@@ -44,9 +43,7 @@ class MyApp extends StatelessWidget {
       ),
       home: FutureBuilder(
         future: context.read(sessionNotifier).tryAutoLoginAsync(),
-        builder: (ctx, snp) => snp.connectionState == ConnectionState.done
-            ? TabsScreen()
-            : SplashScreen(),
+        builder: (ctx, snp) => snp.connectionState == ConnectionState.done ? TabsScreen() : SplashScreen(),
       ),
       // initialRoute: '/',
       routes: {

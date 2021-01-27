@@ -17,7 +17,7 @@ class CategoriesView extends StatefulWidget {
 class _CategoriesViewState extends State<CategoriesView> {
   @override
   Widget build(BuildContext context) {
-  final _ttsService = context.read(ttsProvider);
+    final _ttsService = context.read(ttsProvider);
 
     return Scaffold(
       body: SafeArea(
@@ -37,14 +37,11 @@ class _CategoriesViewState extends State<CategoriesView> {
                       final _categoryState = watch(categoryNotifier.state);
                       return ExpansionPanelList(
                         expandedHeaderPadding: const EdgeInsets.all(0),
-                        expansionCallback: (index, isExpanded) => context
-                            .read(categoryNotifier)
-                            .toggleExpanded(index, isExpanded),
+                        expansionCallback: (index, isExpanded) => context.read(categoryNotifier).toggleExpanded(index, isExpanded),
                         children: _categoryState.categoriesViewModel
                             .map<ExpansionPanel>(
                               (category) => ExpansionPanel(
-                                headerBuilder: (context, isExpanded) =>
-                                    ListTile(title: Text(category.name)),
+                                headerBuilder: (context, isExpanded) => ListTile(title: Text(category.name)),
                                 canTapOnHeader: true,
                                 isExpanded: category.isExpanded,
                                 body: Wrap(
@@ -55,19 +52,14 @@ class _CategoriesViewState extends State<CategoriesView> {
                                   children: category.images
                                       .map(
                                         (image) => Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 16),
+                                          padding: const EdgeInsets.symmetric(vertical: 16),
                                           child: GestureDetector(
-                                            onLongPress: () =>
-                                                _handleLongPressAsync(image),
-                                            onTap: () =>
-                                                _ttsService.speak(image.name),
-                                            onDoubleTap: () =>
-                                                _showBottomSheetAsync(image),
+                                            onLongPress: () => _handleLongPressAsync(image),
+                                            onTap: () => _ttsService.speak(image.name),
+                                            onDoubleTap: () => _showBottomSheetAsync(image),
                                             child: Column(
                                               children: <Widget>[
-                                                Image.network(
-                                                    '${ServicesConstants.CLOUDINARY_URL}/${image.fullyQualifiedPublicUrl}'),
+                                                Image.network('${ServicesConstants.CLOUDINARY_URL}/${image.fullyQualifiedPublicUrl}'),
                                                 Text('${image.name}')
                                               ],
                                             ),
@@ -104,11 +96,9 @@ class _CategoriesViewState extends State<CategoriesView> {
 
     return showModalBottomSheet(
       context: context,
-      builder: (ctx) =>
-          image != null ? CreateUpdateImage(image: image) : CreateUpdateImage(),
+      builder: (ctx) => image != null ? CreateUpdateImage(image: image) : CreateUpdateImage(),
       isScrollControlled: true,
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(25.0))),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(25.0))),
     );
   }
 
@@ -124,8 +114,7 @@ class _CategoriesViewState extends State<CategoriesView> {
                 FlatButton(
                   child: Text(
                     'Voltar',
-                    style: TextStyle(
-                        color: Theme.of(context).textTheme.headline6.color),
+                    style: TextStyle(color: Theme.of(context).textTheme.headline6.color),
                   ),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
@@ -135,9 +124,7 @@ class _CategoriesViewState extends State<CategoriesView> {
                       style: TextStyle(color: Colors.red),
                     ),
                     onPressed: () async {
-                      await context
-                          .read(categoryNotifier)
-                          .removeImageAsync(image);
+                      await context.read(categoryNotifier).removeImageAsync(image);
                       Navigator.of(context).pop();
                     })
               ],

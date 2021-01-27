@@ -41,8 +41,7 @@ class _TabsScreenState extends State<TabsScreen> {
   void _bottomTapped(int index) {
     setState(() {
       _selectScreenIndex = index;
-      _pageController.animateToPage(index,
-          duration: Duration(milliseconds: 500), curve: Curves.easeOut);
+      _pageController.animateToPage(index, duration: Duration(milliseconds: 500), curve: Curves.easeOut);
     });
   }
 
@@ -71,27 +70,23 @@ class _TabsScreenState extends State<TabsScreen> {
                   BottomNavigationBarItem(
                     backgroundColor: Theme.of(context).primaryColor,
                     icon: Icon(Icons.image),
-                    title: const Text('Imagens'),
+                    label: 'Imagens',
                   ),
                   BottomNavigationBarItem(
                     backgroundColor: Theme.of(context).primaryColor,
                     icon: Icon(Icons.category),
-                    title: const Text('Categorias'),
+                    label: 'Categorias',
                   ),
                   BottomNavigationBarItem(
                     backgroundColor: Theme.of(context).primaryColor,
-                    icon: Icon(!_userStateNotifier.isAuthenticated
-                        ? Icons.supervisor_account
-                        : Icons.exit_to_app),
-                    title: Text(!_userStateNotifier.isAuthenticated
-                        ? 'Entrar'
-                        : 'Sair'),
+                    icon: Icon(!_userStateNotifier.isAuthenticated ? Icons.supervisor_account : Icons.exit_to_app),
+                    label: !_userStateNotifier.isAuthenticated ? 'Entrar' : 'Sair',
                   ),
                   if (!_userStateNotifier.isAuthenticated)
                     BottomNavigationBarItem(
                       backgroundColor: Theme.of(context).primaryColor,
                       icon: Icon(Icons.perm_identity),
-                      title: const Text('Registrar'),
+                      label: 'Registrar',
                     ),
                 ],
               ),

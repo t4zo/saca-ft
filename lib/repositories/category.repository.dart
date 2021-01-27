@@ -15,18 +15,17 @@ class CategoryRepository {
     _httpService = HttpService();
     _httpService.dio.options.baseUrl += '/categories';
   }
-  
+
   Future<HttpResponse<List<Category>>> getAllAsync(User user) async {
     try {
       Response response = await _httpService.dio.get('',
-          options: Options(contentType: ContentType.json.mimeType, headers: {
-            HttpHeaders.authorizationHeader: 'Bearer ${user?.token}'
-          }));
+          options: Options(
+            contentType: ContentType.json.mimeType,
+            headers: {HttpHeaders.authorizationHeader: 'Bearer ${user?.token}'},
+          ));
 
       if (response.statusCode == 200) {
-        var categories = (response.data as List)
-            .map((category) => Category.fromJson(category))
-            .toList();
+        var categories = (response.data as List).map((category) => Category.fromJson(category)).toList();
 
         return HttpResponse(response: categories);
       }

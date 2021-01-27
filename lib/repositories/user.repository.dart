@@ -56,8 +56,9 @@ class UserRepository {
       }
 
       return HttpResponse(
-          error: DioError(error: HttpConstants.CODE_NOT_200),
-          errorMessage: FieldConstants.INVALID);
+        error: DioError(error: HttpConstants.CODE_NOT_200),
+        errorMessage: FieldConstants.INVALID,
+      );
     } on DioError catch (error) {
       // final errorResponse = json.decode(error.response.data)['detail'] as Map<String, dynamic>;
       // final errorField = errorResponse.entries.first;

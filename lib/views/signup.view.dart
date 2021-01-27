@@ -32,9 +32,7 @@ class _SignUpScreenView extends State<SignUpView> {
           onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
           child: SingleChildScrollView(
             child: Container(
-              height: MediaQuery.of(context).size.height -
-                  MediaQuery.of(context).padding.top -
-                  56,
+              height: MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top - 56,
               child: Consumer(builder: (context, watch, child) {
                 // final _userStateNotifier = watch(userStateNotifier.state);
                 return Column(
@@ -46,8 +44,7 @@ class _SignUpScreenView extends State<SignUpView> {
                       semanticLabel: 'Logo SACA',
                     ),
                     Container(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: MediaQuery.of(context).size.width * 0.15),
+                      padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.15),
                       child: Form(
                         key: _form,
                         child: Column(
@@ -55,32 +52,27 @@ class _SignUpScreenView extends State<SignUpView> {
                           children: <Widget>[
                             TextFormField(
                               textInputAction: TextInputAction.next,
-                              onFieldSubmitted: (_) => FocusScope.of(context)
-                                  .requestFocus(_emailFocusNode),
+                              onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_emailFocusNode),
                               decoration: InputDecoration(
                                 labelText: 'Nome',
                               ),
                               validator: (value) {
-                                if (value.isEmpty)
-                                  return 'Por favor, informe seu nome';
+                                if (value.isEmpty) return 'Por favor, informe seu nome';
                                 return null;
                               },
-                              onSaved: (value) =>
-                                  signUpViewModel.username = value,
+                              onSaved: (value) => signUpViewModel.username = value,
                             ),
                             SizedBox(
                               height: 10,
                             ),
                             TextFormField(
                               textInputAction: TextInputAction.next,
-                              onFieldSubmitted: (_) => FocusScope.of(context)
-                                  .requestFocus(_passwordFocusNode),
+                              onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_passwordFocusNode),
                               decoration: InputDecoration(
                                 labelText: 'Email',
                               ),
                               validator: (value) {
-                                if (value.isEmpty)
-                                  return 'Por favor, informe seu email';
+                                if (value.isEmpty) return 'Por favor, informe seu email';
                                 return null;
                               },
                               onSaved: (value) => signUpViewModel.email = value,
@@ -91,8 +83,7 @@ class _SignUpScreenView extends State<SignUpView> {
                             TextFormField(
                               controller: _passwordController,
                               textInputAction: TextInputAction.next,
-                              onFieldSubmitted: (_) => FocusScope.of(context)
-                                  .requestFocus(_confirmPasswordFocusNode),
+                              onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_confirmPasswordFocusNode),
                               autocorrect: false,
                               obscureText: true,
                               textCapitalization: TextCapitalization.none,
@@ -100,17 +91,12 @@ class _SignUpScreenView extends State<SignUpView> {
                                 labelText: 'Senha',
                               ),
                               validator: (value) {
-                                if (value.length < 6)
-                                  return 'Informe uma senha maior que 5 caractéres';
-                                if (!value.contains(RegExp(r'[A-Za-z]')) ||
-                                    !value.contains(RegExp(r'[0-9]')))
-                                  return 'Deve conter letras e números';
-                                if (value != _confirmPasswordController.text)
-                                  return 'Senhas não conferem';
+                                if (value.length < 6) return 'Informe uma senha maior que 5 caractéres';
+                                if (!value.contains(RegExp(r'[A-Za-z]')) || !value.contains(RegExp(r'[0-9]'))) return 'Deve conter letras e números';
+                                if (value != _confirmPasswordController.text) return 'Senhas não conferem';
                                 return null;
                               },
-                              onSaved: (value) =>
-                                  signUpViewModel.password = value,
+                              onSaved: (value) => signUpViewModel.password = value,
                             ),
                             SizedBox(
                               height: 10,
@@ -125,12 +111,10 @@ class _SignUpScreenView extends State<SignUpView> {
                                 labelText: 'Confirmar Senha',
                               ),
                               validator: (value) {
-                                if (value != _passwordController.text)
-                                  return 'Senhas não conferem';
+                                if (value != _passwordController.text) return 'Senhas não conferem';
                                 return null;
                               },
-                              onSaved: (value) =>
-                                  signUpViewModel.confirmPassword = value,
+                              onSaved: (value) => signUpViewModel.confirmPassword = value,
                             ),
                           ],
                         ),
@@ -140,15 +124,11 @@ class _SignUpScreenView extends State<SignUpView> {
                         child: Text('Registrar'),
                         elevation: 2,
                         color: Theme.of(context).primaryColor,
-                        textColor:
-                            Theme.of(context).primaryTextTheme.headline6.color,
+                        textColor: Theme.of(context).primaryTextTheme.headline6.color,
                         onPressed: () async {
                           await _handleSignUpAsync();
-                          if (context
-                              .read(userStateNotifier)
-                              .isAuthenticated()) {
-                            return Navigator.pushNamed(
-                                context, CategoriesView.routeName);
+                          if (context.read(userStateNotifier).isAuthenticated()) {
+                            return Navigator.pushNamed(context, CategoriesView.routeName);
                           } else {
                             return Future.value(
                               Container(width: 0, height: 0),
@@ -174,8 +154,7 @@ class _SignUpScreenView extends State<SignUpView> {
     final sessionStore = context.read(sessionNotifier);
     final response = await sessionStore.signUpAsync(signUpViewModel);
     if (response.isEmpty) {
-      await sessionStore.signInAsync(SignInViewModel(
-          email: signUpViewModel.email, password: signUpViewModel.password));
+      await sessionStore.signInAsync(SignInViewModel(email: signUpViewModel.email, password: signUpViewModel.password));
     } else {
       Scaffold.of(context).showSnackBar(SnackBar(content: Text(response)));
     }

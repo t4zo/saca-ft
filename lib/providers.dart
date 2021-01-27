@@ -11,8 +11,7 @@ import 'notifiers/user.notifier.dart';
 
 final userStateNotifier = StateNotifierProvider((ref) => UserStateNotifier());
 
-final sessionNotifier = StateNotifierProvider(
-    (ref) => SessionStore(ref.read(userStateNotifier), UserRepository()));
+final sessionNotifier = StateNotifierProvider((ref) => SessionStore(ref.read(userStateNotifier), UserRepository()));
 
 final categoryNotifier = StateNotifierProvider(
   (ref) => CategoryStateNotifier(

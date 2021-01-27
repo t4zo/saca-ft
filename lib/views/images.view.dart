@@ -44,21 +44,14 @@ class _ImagesViewState extends State<ImagesView> {
                     itemBuilder: (ctx, i) => ClipRRect(
                       borderRadius: BorderRadius.circular(10),
                       child: GestureDetector(
-                        onLongPress: () =>
-                            _handleLongPressAsync(_categoryNotifier.images[i]),
-                        onTap: () =>
-                            _ttsService.speak(_categoryNotifier.images[i].name),
-                        onDoubleTap: () =>
-                            _showBottomSheetAsync(_categoryNotifier.images[i]),
+                        onLongPress: () => _handleLongPressAsync(_categoryNotifier.images[i]),
+                        onTap: () => _ttsService.speak(_categoryNotifier.images[i].name),
+                        onDoubleTap: () => _showBottomSheetAsync(_categoryNotifier.images[i]),
                         child: GridTile(
-                          child: Image.network(
-                              '${ServicesConstants.CLOUDINARY_URL}/${_categoryNotifier.images[i].url}'),
+                          child: Image.network('${ServicesConstants.CLOUDINARY_URL}/${_categoryNotifier.images[i].url}'),
                           footer: LayoutBuilder(
-                            builder: (BuildContext context,
-                                    BoxConstraints constraints) =>
-                                Container(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 15),
+                            builder: (BuildContext context, BoxConstraints constraints) => Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 15),
                               child: Container(
                                 color: Colors.white,
                                 width: constraints.maxWidth,
@@ -96,16 +89,13 @@ class _ImagesViewState extends State<ImagesView> {
   }
 
   Future _showBottomSheetAsync([Images.Image image]) async {
-    if (image != null &&
-        image.categoryId != ApplicationConstants.categorialPessoalId) return;
+    if (image != null && image.categoryId != ApplicationConstants.categorialPessoalId) return;
 
     return showModalBottomSheet(
       context: context,
-      builder: (ctx) =>
-          image != null ? CreateUpdateImage(image: image) : CreateUpdateImage(),
+      builder: (ctx) => image != null ? CreateUpdateImage(image: image) : CreateUpdateImage(),
       isScrollControlled: true,
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(25.0))),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(25.0))),
     );
   }
 
@@ -121,8 +111,7 @@ class _ImagesViewState extends State<ImagesView> {
                 FlatButton(
                   child: Text(
                     'Voltar',
-                    style: TextStyle(
-                        color: Theme.of(context).textTheme.headline6.color),
+                    style: TextStyle(color: Theme.of(context).textTheme.headline6.color),
                   ),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
@@ -132,9 +121,7 @@ class _ImagesViewState extends State<ImagesView> {
                       style: TextStyle(color: Colors.red),
                     ),
                     onPressed: () async {
-                      await context
-                          .read(categoryNotifier)
-                          .removeImageAsync(image);
+                      await context.read(categoryNotifier).removeImageAsync(image);
                       Navigator.of(context).pop();
                     })
               ],

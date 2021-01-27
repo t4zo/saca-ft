@@ -7,7 +7,6 @@ import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart' as syspaths;
 import 'package:saca/constants/application.constants.dart';
@@ -57,8 +56,7 @@ class _CreateUpdateImageState extends State<CreateUpdateImage> {
     return GestureDetector(
       onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
       child: Container(
-        height:
-            MediaQuery.of(context).size.height * (_keyboardVisible ? 0.7 : 0.3),
+        height: MediaQuery.of(context).size.height * (_keyboardVisible ? 0.7 : 0.3),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
@@ -73,8 +71,7 @@ class _CreateUpdateImageState extends State<CreateUpdateImage> {
             ),
             Expanded(
               child: Padding(
-                padding: EdgeInsets.only(
-                    bottom: MediaQuery.of(context).viewInsets.bottom),
+                padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -84,10 +81,7 @@ class _CreateUpdateImageState extends State<CreateUpdateImage> {
                       child: Container(
                         height: 100,
                         width: 100,
-                        decoration: BoxDecoration(
-                            border: Border.all(
-                                width: 1,
-                                color: Theme.of(context).primaryColor)),
+                        decoration: BoxDecoration(border: Border.all(width: 1, color: Theme.of(context).primaryColor)),
                         alignment: Alignment.center,
                         child: _image == null
                             ? Icon(
@@ -133,8 +127,7 @@ class _CreateUpdateImageState extends State<CreateUpdateImage> {
                   child: _loading
                       ? SizedBox(
                           height: 10,
-                          child:
-                              const CircularProgressIndicator(strokeWidth: 3),
+                          child: const CircularProgressIndicator(strokeWidth: 3),
                         )
                       : Text(
                           _isUpdate ? 'Atualizar' : 'Salvar',
@@ -165,9 +158,7 @@ class _CreateUpdateImageState extends State<CreateUpdateImage> {
   void downloadFileAsync(String localImagePath) async {
     final localFile = File(localImagePath);
 
-    final response = await Dio().download(
-        '${ServicesConstants.CLOUDINARY_URL}/${widget.image.url}',
-        localImagePath);
+    final response = await Dio().download('${ServicesConstants.CLOUDINARY_URL}/${widget.image.url}', localImagePath);
 
     if (response.statusCode != 200) return;
 
@@ -200,20 +191,16 @@ class _CreateUpdateImageState extends State<CreateUpdateImage> {
         context: context,
         builder: (_) {
           return SimpleDialog(
-            title: Text('Escolha o modo',
-                style: TextStyle(
-                    fontSize: Theme.of(context).textTheme.headline6.fontSize)),
+            title: Text('Escolha o modo', style: TextStyle(fontSize: Theme.of(context).textTheme.headline6.fontSize)),
             children: <Widget>[
               SimpleDialogOption(
                 child: const Text('Galeria', style: TextStyle(fontSize: 16)),
-                padding:
-                    const EdgeInsets.symmetric(vertical: 20, horizontal: 25),
+                padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 25),
                 onPressed: () => Navigator.of(context).pop(ImageSource.gallery),
               ),
               SimpleDialogOption(
                 child: const Text('Câmera', style: TextStyle(fontSize: 16)),
-                padding:
-                    const EdgeInsets.symmetric(vertical: 20, horizontal: 25),
+                padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 25),
                 onPressed: () => Navigator.of(context).pop(ImageSource.camera),
               ),
             ],
