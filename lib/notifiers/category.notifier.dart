@@ -1,12 +1,10 @@
-import 'package:mobx/mobx.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:saca/models/image.model.dart';
 import 'package:saca/repositories/category.repository.dart';
 import 'package:saca/repositories/image.repository.dart';
-import 'package:saca/stores/user.store.dart';
+import 'package:saca/notifiers/user.notifier.dart';
 import 'package:saca/view-models/category.viewmodel.dart';
 import 'package:saca/view-models/image.viewmodel.dart';
-
-part 'category.store.g.dart';
 
 class ImageStoreResponse {
   bool response;
@@ -15,62 +13,53 @@ class ImageStoreResponse {
   ImageStoreResponse({this.response, this.errorMessage});
 }
 
-class CategoryStore extends _CategoryStore with _$CategoryStore {
-  CategoryStore(UserStore userStore, CategoryRepository categoryRepository,
-      ImageRepository imageRepository)
-      : super(userStore, categoryRepository, imageRepository);
+class CategoryState {
+  List<CategoryViewModel> categoriesViewModel;
+
+  List<Image> get images {
+    // List<Image> imgs = [];
+    // categories.forEach((category) => imgs.addAll(category.images));
+    // return imgs;
+
+    return categoriesViewModel.expand((category) => category.images).toList();
+  }
+
+  CategoryState(this.categoriesViewModel);
+
+  CategoryState.empty() {
+    this.categoriesViewModel = null;
+  }
 }
 
-abstract class _CategoryStore with Store {
-  final UserStore _userStore;
+class CategoryStateNotifier extends StateNotifier<CategoryState> {
+  final UserStateNotifier _userStateNotifier;
   final CategoryRepository _categoryRepository;
   final ImageRepository _imageRepository;
 
-  @observable
-  Iterable<CategoryViewModel> _categories = [];
+  CategoryStateNotifier(this._userStateNotifier, this._categoryRepository, this._imageRepository, [List<CategoryViewModel> categoriesViewModel])
+      : super(CategoryState(categoriesViewModel ?? List<CategoryViewModel>.empty()));
 
-  _CategoryStore(
-      this._userStore, this._categoryRepository, this._imageRepository);
+  List<Image> images() => state.images;
 
-  @computed
-  List<CategoryViewModel> get categories => [..._categories];
-
-  @computed
-  List<Image> get images {
-    List<Image> imgs = [];
-    // return _categories.map((category) => category.images);
-
-    categories.forEach((category) {
-      category.images.forEach((img) {
-        imgs.add(img);
-      });
-    });
-
-    return imgs;
-  }
-
-  @action
   void toggleExpanded(int index, bool isExpanded) {
-    List<CategoryViewModel> newCategories = categories;
-    newCategories[index].isExpanded = !isExpanded;
-    _categories = newCategories;
+    final _categoriesViewModel = state.categoriesViewModel;
+    _categoriesViewModel[index].isExpanded = !isExpanded;
+    state = CategoryState(_categoriesViewModel);
   }
 
-  @action
   Future<String> getAllAsync() async {
-    final http = await _categoryRepository.getAllAsync(_userStore.user);
+    final http = await _categoryRepository.getAllAsync(_userStateNotifier.state.user);
     if (http.error != null) return http.errorMessage;
 
     final categories = http.response;
-    _categories = CategoryViewModel.fromCategoryList(categories).toList();
+    final categoriesViewModel = CategoryViewModel.fromCategoryList(categories).toList();
+    state = CategoryState(categoriesViewModel);
 
     return "";
   }
 
-  @action
   Future<String> addImageAsync(ImageViewModel imageViewModel) async {
-    final http =
-        await _imageRepository.createAsync(_userStore.user, imageViewModel);
+    final http = await _imageRepository.createAsync(_userStateNotifier.state.user, imageViewModel);
     if (http.error != null) return http.errorMessage;
 
     return await getAllAsync();
@@ -90,9 +79,8 @@ abstract class _CategoryStore with Store {
     // return "";
   }
 
-  @action
   Future<String> updateImageAsync(ImageViewModel image) async {
-    final http = await _imageRepository.updateAsync(_userStore.user, image);
+    final http = await _imageRepository.updateAsync(_userStateNotifier.state.user, image);
     if (http.error != null) return http.errorMessage;
 
     return await getAllAsync();
@@ -119,9 +107,8 @@ abstract class _CategoryStore with Store {
     // return "";
   }
 
-  @action
   Future<String> removeImageAsync(Image image) async {
-    final http = await _imageRepository.removeAsync(_userStore.user, image);
+    final http = await _imageRepository.removeAsync(_userStateNotifier.state.user, image);
     if (http.error != null) return http.errorMessage;
 
     return await getAllAsync();

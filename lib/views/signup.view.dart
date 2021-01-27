@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:provider/provider.dart';
-import 'package:saca/stores/session.store.dart';
-import 'package:saca/stores/user.store.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:saca/providers.dart';
 import 'package:saca/view-models/signin.viewmodel.dart';
 import 'package:saca/view-models/signup.viewmodel.dart';
 import 'package:saca/views/categories.view.dart';
@@ -28,8 +26,6 @@ class _SignUpScreenView extends State<SignUpView> {
 
   @override
   Widget build(BuildContext context) {
-    final userStore = Provider.of<UserStore>(context, listen: false);
-
     return Scaffold(
       body: SafeArea(
         child: GestureDetector(
@@ -39,107 +35,108 @@ class _SignUpScreenView extends State<SignUpView> {
               height: MediaQuery.of(context).size.height -
                   MediaQuery.of(context).padding.top -
                   56,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  Image.asset(
-                    'assets/images/logo.png',
-                    scale: 4,
-                    semanticLabel: 'Logo SACA',
-                  ),
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: MediaQuery.of(context).size.width * 0.15),
-                    child: Form(
-                      key: _form,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-                          TextFormField(
-                            textInputAction: TextInputAction.next,
-                            onFieldSubmitted: (_) => FocusScope.of(context)
-                                .requestFocus(_emailFocusNode),
-                            decoration: InputDecoration(
-                              labelText: 'Nome',
+              child: Consumer(builder: (context, watch, child) {
+                // final _userStateNotifier = watch(userStateNotifier.state);
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    Image.asset(
+                      'assets/images/logo.png',
+                      scale: 4,
+                      semanticLabel: 'Logo SACA',
+                    ),
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: MediaQuery.of(context).size.width * 0.15),
+                      child: Form(
+                        key: _form,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: <Widget>[
+                            TextFormField(
+                              textInputAction: TextInputAction.next,
+                              onFieldSubmitted: (_) => FocusScope.of(context)
+                                  .requestFocus(_emailFocusNode),
+                              decoration: InputDecoration(
+                                labelText: 'Nome',
+                              ),
+                              validator: (value) {
+                                if (value.isEmpty)
+                                  return 'Por favor, informe seu nome';
+                                return null;
+                              },
+                              onSaved: (value) =>
+                                  signUpViewModel.username = value,
                             ),
-                            validator: (value) {
-                              if (value.isEmpty)
-                                return 'Por favor, informe seu nome';
-                              return null;
-                            },
-                            onSaved: (value) =>
-                                signUpViewModel.username = value,
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          TextFormField(
-                            textInputAction: TextInputAction.next,
-                            onFieldSubmitted: (_) => FocusScope.of(context)
-                                .requestFocus(_passwordFocusNode),
-                            decoration: InputDecoration(
-                              labelText: 'Email',
+                            SizedBox(
+                              height: 10,
                             ),
-                            validator: (value) {
-                              if (value.isEmpty)
-                                return 'Por favor, informe seu email';
-                              return null;
-                            },
-                            onSaved: (value) => signUpViewModel.email = value,
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          TextFormField(
-                            controller: _passwordController,
-                            textInputAction: TextInputAction.next,
-                            onFieldSubmitted: (_) => FocusScope.of(context)
-                                .requestFocus(_confirmPasswordFocusNode),
-                            autocorrect: false,
-                            obscureText: true,
-                            textCapitalization: TextCapitalization.none,
-                            decoration: InputDecoration(
-                              labelText: 'Senha',
+                            TextFormField(
+                              textInputAction: TextInputAction.next,
+                              onFieldSubmitted: (_) => FocusScope.of(context)
+                                  .requestFocus(_passwordFocusNode),
+                              decoration: InputDecoration(
+                                labelText: 'Email',
+                              ),
+                              validator: (value) {
+                                if (value.isEmpty)
+                                  return 'Por favor, informe seu email';
+                                return null;
+                              },
+                              onSaved: (value) => signUpViewModel.email = value,
                             ),
-                            validator: (value) {
-                              if (value.length < 6)
-                                return 'Informe uma senha maior que 5 caractéres';
-                              if (!value.contains(RegExp(r'[A-Za-z]')) ||
-                                  !value.contains(RegExp(r'[0-9]')))
-                                return 'Deve conter letras e números';
-                              if (value != _confirmPasswordController.text)
-                                return 'Senhas não conferem';
-                              return null;
-                            },
-                            onSaved: (value) =>
-                                signUpViewModel.password = value,
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          TextFormField(
-                            controller: _confirmPasswordController,
-                            textInputAction: TextInputAction.done,
-                            autocorrect: false,
-                            obscureText: true,
-                            textCapitalization: TextCapitalization.none,
-                            decoration: InputDecoration(
-                              labelText: 'Confirmar Senha',
+                            SizedBox(
+                              height: 10,
                             ),
-                            validator: (value) {
-                              if (value != _passwordController.text)
-                                return 'Senhas não conferem';
-                              return null;
-                            },
-                            onSaved: (value) =>
-                                signUpViewModel.confirmPassword = value,
-                          ),
-                        ],
+                            TextFormField(
+                              controller: _passwordController,
+                              textInputAction: TextInputAction.next,
+                              onFieldSubmitted: (_) => FocusScope.of(context)
+                                  .requestFocus(_confirmPasswordFocusNode),
+                              autocorrect: false,
+                              obscureText: true,
+                              textCapitalization: TextCapitalization.none,
+                              decoration: InputDecoration(
+                                labelText: 'Senha',
+                              ),
+                              validator: (value) {
+                                if (value.length < 6)
+                                  return 'Informe uma senha maior que 5 caractéres';
+                                if (!value.contains(RegExp(r'[A-Za-z]')) ||
+                                    !value.contains(RegExp(r'[0-9]')))
+                                  return 'Deve conter letras e números';
+                                if (value != _confirmPasswordController.text)
+                                  return 'Senhas não conferem';
+                                return null;
+                              },
+                              onSaved: (value) =>
+                                  signUpViewModel.password = value,
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            TextFormField(
+                              controller: _confirmPasswordController,
+                              textInputAction: TextInputAction.done,
+                              autocorrect: false,
+                              obscureText: true,
+                              textCapitalization: TextCapitalization.none,
+                              decoration: InputDecoration(
+                                labelText: 'Confirmar Senha',
+                              ),
+                              validator: (value) {
+                                if (value != _passwordController.text)
+                                  return 'Senhas não conferem';
+                                return null;
+                              },
+                              onSaved: (value) =>
+                                  signUpViewModel.confirmPassword = value,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  Observer(
-                    builder: (ctx) => RaisedButton(
+                    RaisedButton(
                         child: Text('Registrar'),
                         elevation: 2,
                         color: Theme.of(context).primaryColor,
@@ -147,7 +144,9 @@ class _SignUpScreenView extends State<SignUpView> {
                             Theme.of(context).primaryTextTheme.headline6.color,
                         onPressed: () async {
                           await _handleSignUpAsync();
-                          if (userStore.isAuthenticated) {
+                          if (context
+                              .read(userStateNotifier)
+                              .isAuthenticated()) {
                             return Navigator.pushNamed(
                                 context, CategoriesView.routeName);
                           } else {
@@ -156,9 +155,9 @@ class _SignUpScreenView extends State<SignUpView> {
                             );
                           }
                         }),
-                  ),
-                ],
-              ),
+                  ],
+                );
+              }),
             ),
           ),
         ),
@@ -172,7 +171,7 @@ class _SignUpScreenView extends State<SignUpView> {
 
     _form.currentState.save();
 
-    final sessionStore = Provider.of<SessionStore>(context, listen: false);
+    final sessionStore = context.read(sessionNotifier);
     final response = await sessionStore.signUpAsync(signUpViewModel);
     if (response.isEmpty) {
       await sessionStore.signInAsync(SignInViewModel(

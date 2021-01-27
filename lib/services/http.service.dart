@@ -37,9 +37,7 @@ class HttpService {
       // );
   }
 
-  Dio get dio {
-    return _dio;
-  }
+  Dio get dio => _dio;
 
   void addToken(String token) {
     _dio.options.headers.putIfAbsent('Authorization', () => 'Bearer $token');

@@ -22,8 +22,7 @@ class UserRepository {
     model.remember = false;
 
     try {
-      Response response =
-          await _httpService.dio.post('/signin', data: model);
+      Response response = await _httpService.dio.post('/signin', data: model);
 
       if (response.statusCode == 200) {
         final user = User.fromJson(response.data['user']);

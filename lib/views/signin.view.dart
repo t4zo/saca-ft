@@ -1,16 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:provider/provider.dart';
-import 'package:saca/stores/session.store.dart';
-import 'package:saca/stores/user.store.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:saca/providers.dart';
 import 'package:saca/view-models/signin.viewmodel.dart';
 import 'package:saca/views/categories.view.dart';
 
 class SignInView extends StatefulWidget {
   static const routeName = '/signin';
-  // IAuthController authController;
-
-  // SignInView(this.authController);
 
   @override
   _SignInViewState createState() => _SignInViewState();
@@ -26,11 +21,11 @@ class _SignInViewState extends State<SignInView> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final _userStore = Provider.of<UserStore>(context, listen: false);
+    final _userNotifier = context.read(userStateNotifier.state);
 
-    if (_userStore.isAuthenticated) {
+    if (_userNotifier.isAuthenticated) {
       _initialValues = {
-        'email': _userStore.user.email,
+        'email': _userNotifier.user.email,
         'password': '**********',
       };
     }
@@ -45,116 +40,90 @@ class _SignInViewState extends State<SignInView> {
 
   @override
   Widget build(BuildContext context) {
-    final _userStore = Provider.of<UserStore>(context, listen: false);
-
     return Scaffold(
       body: SafeArea(
         child: GestureDetector(
           onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
           child: SingleChildScrollView(
-            child: Container(
-              height: MediaQuery.of(context).size.height -
-                  MediaQuery.of(context).padding.top -
-                  56,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  Container(
-                    child: Image.asset(
-                      'assets/images/logo.png',
-                      scale: 4,
-                      semanticLabel: 'Logo SACA',
-                    ),
-                  ),
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: MediaQuery.of(context).size.width * 0.15),
-                    child: Form(
-                      key: _form,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-                          TextFormField(
-                            initialValue: _initialValues['email'],
-                            enabled: !_userStore.isAuthenticated,
-                            textInputAction: TextInputAction.next,
-                            onFieldSubmitted: (_) => FocusScope.of(context)
-                                .requestFocus(_passwordFocusNode),
-                            decoration:
-                                const InputDecoration(labelText: 'Email'),
-                            validator: (value) {
-                              if (value.isEmpty)
-                                return 'Por favor, informe seu email';
-                              return null;
-                            },
-                            onSaved: (value) => signInViewModel.email = value,
-                          ),
-                          SizedBox(
-                            height: 20,
-                          ),
-                          TextFormField(
-                            // initialValue: _initialValues['password'],
-                            obscureText: true,
-                            enabled: !_userStore.isAuthenticated,
-                            textInputAction: TextInputAction.done,
-                            focusNode: _passwordFocusNode,
-                            decoration:
-                                const InputDecoration(labelText: 'Senha'),
-                            validator: (value) {
-                              if (value.isEmpty)
-                                return 'Por favor, informe sua senha';
-                              return null;
-                            },
-                            onSaved: (value) =>
-                                signInViewModel.password = value,
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: FlatButton(
-                              padding: const EdgeInsets.only(left: 0),
-                              child: Observer(
-                                  builder: (ctx) => _userStore.isAuthenticated
-                                      ? Text(
-                                          'Remover conta',
-                                          style: TextStyle(
-                                            color: Colors.red,
-                                            fontWeight: FontWeight.w700,
-                                          ),
-                                        )
-                                      : Text('Esqueceu a senha?')),
-                              onPressed: () => _userStore.isAuthenticated
-                                  ? _handleRemoveAccount
-                                  : _handleRecoverPassword,
-                            ),
-                          ),
-                        ],
+            child: Consumer(builder: (context, watch, child) {
+              final _userStateNotifier = watch(userStateNotifier.state);
+              return Container(
+                height: MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top - 56,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    Container(
+                      child: Image.asset(
+                        'assets/images/logo.png',
+                        scale: 4,
+                        semanticLabel: 'Logo SACA',
                       ),
                     ),
-                  ),
-                  RaisedButton(
-                    child: signInViewModel.busy
-                        ? SizedBox(
-                            height: 15,
-                            child:
-                                const CircularProgressIndicator(strokeWidth: 3),
-                          )
-                        : Observer(
-                            builder: (ctx) => Text(
-                              !_userStore.isAuthenticated ? 'Entrar' : 'Sair',
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.15),
+                      child: Form(
+                        key: _form,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: <Widget>[
+                            TextFormField(
+                              initialValue: _initialValues['email'],
+                              enabled: !_userStateNotifier.isAuthenticated,
+                              textInputAction: TextInputAction.next,
+                              onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_passwordFocusNode),
+                              decoration: const InputDecoration(labelText: 'Email'),
+                              validator: (value) {
+                                if (value.isEmpty) return 'Por favor, informe seu email';
+                                return null;
+                              },
+                              onSaved: (value) => signInViewModel.email = value,
                             ),
-                          ),
-                    elevation: 2,
-                    color: Theme.of(context).primaryColor,
-                    textColor:
-                        Theme.of(context).primaryTextTheme.headline6.color,
-                    onPressed: _handleSignInAndSignOutAsync,
-                  ),
-                ],
-              ),
-            ),
+                            SizedBox(
+                              height: 20,
+                            ),
+                            TextFormField(
+                              // initialValue: _initialValues['password'],
+                              obscureText: true,
+                              enabled: !_userStateNotifier.isAuthenticated,
+                              textInputAction: TextInputAction.done,
+                              focusNode: _passwordFocusNode,
+                              decoration: const InputDecoration(labelText: 'Senha'),
+                              validator: (value) {
+                                if (value.isEmpty) return 'Por favor, informe sua senha';
+                                return null;
+                              },
+                              onSaved: (value) => signInViewModel.password = value,
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: FlatButton(
+                                padding: const EdgeInsets.only(left: 0),
+                                child: context.read(userStateNotifier.state).isAuthenticated
+                                    ? Text('Remover conta', style: TextStyle(color: Colors.red, fontWeight: FontWeight.w700))
+                                    : Text('Esqueceu a senha?'),
+                                onPressed: () => _userStateNotifier.isAuthenticated ? _handleRemoveAccount : _handleRecoverPassword,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    RaisedButton(
+                      child: signInViewModel.busy
+                          ? SizedBox(height: 15, child: const CircularProgressIndicator(strokeWidth: 3))
+                          : Text(!context.read(userStateNotifier.state).isAuthenticated ? 'Entrar' : 'Sair'),
+                      elevation: 2,
+                      color: Theme.of(context).primaryColor,
+                      textColor: Theme.of(context).primaryTextTheme.headline6.color,
+                      onPressed: _handleSignInAndSignOutAsync,
+                    ),
+                  ],
+                ),
+              );
+            }),
           ),
         ),
       ),
@@ -167,20 +136,19 @@ class _SignInViewState extends State<SignInView> {
 
     _form.currentState.save();
 
-    final result = await Provider.of<SessionStore>(context, listen: false)
-        .signInAsync(signInViewModel);
-    
+    final result = await context.read(sessionNotifier).signInAsync(signInViewModel);
+
     return result;
   }
 
   Future _handleSignInAndSignOutAsync() async {
-    final _userStore = Provider.of<UserStore>(context, listen: false);
+    final _userStateNotifier = context.read(userStateNotifier.state);
 
     setState(() {
       signInViewModel.busy = true;
     });
 
-    if (!_userStore.isAuthenticated) {
+    if (!_userStateNotifier.isAuthenticated) {
       final result = await _signInAsync();
       if (result.isEmpty) {
         Navigator.pushNamed(context, CategoriesView.routeName);
@@ -190,7 +158,7 @@ class _SignInViewState extends State<SignInView> {
         ));
       }
     } else {
-      Provider.of<SessionStore>(context, listen: false).signOutAsync();
+      context.read(sessionNotifier).signOutAsync();
       _initialValues['password'] = '';
     }
 

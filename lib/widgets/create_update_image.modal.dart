@@ -5,13 +5,14 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart' as syspaths;
-import 'package:provider/provider.dart';
 import 'package:saca/constants/application.constants.dart';
 import 'package:saca/constants/services.constants.dart';
-import 'package:saca/stores/category.store.dart';
+import 'package:saca/providers.dart';
 import 'package:saca/view-models/image.viewmodel.dart';
 import 'package:saca/models/image.model.dart' as Images;
 import 'package:uuid/uuid.dart';
@@ -246,7 +247,7 @@ class _CreateUpdateImageState extends State<CreateUpdateImage> {
 
     _form.currentState.save();
 
-    final categoryStore = Provider.of<CategoryStore>(context, listen: false);
+    final _categoryNotifier = context.read(categoryNotifier);
 
     final imageBytes = await _image.readAsBytes();
 
@@ -258,14 +259,14 @@ class _CreateUpdateImageState extends State<CreateUpdateImage> {
 
     String response;
     if (_isUpdate) {
-      response = await categoryStore.updateImageAsync(ImageViewModel(
+      response = await _categoryNotifier.updateImageAsync(ImageViewModel(
         id: widget.image.id,
         categoryId: _model.categoryId,
         name: _model.name,
         base64: _model.base64,
       ));
     } else {
-      response = await categoryStore.addImageAsync(_model);
+      response = await _categoryNotifier.addImageAsync(_model);
     }
 
     setState(() {

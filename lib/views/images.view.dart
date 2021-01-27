@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:saca/constants/application.constants.dart';
 import 'package:saca/constants/services.constants.dart';
 import 'package:saca/models/image.model.dart' as Images;
-import 'package:saca/services/tts.service.dart';
-import 'package:saca/stores/category.store.dart';
-import 'package:saca/stores/user.store.dart';
+import 'package:saca/providers.dart';
 import 'package:saca/widgets/create_update_image.modal.dart';
 
 class ImagesView extends StatefulWidget {
@@ -15,17 +12,14 @@ class ImagesView extends StatefulWidget {
 }
 
 class _ImagesViewState extends State<ImagesView> {
-  final _ttsService = TtsService();
-
   @override
   Widget build(BuildContext context) {
-    final _userStore = Provider.of<UserStore>(context, listen: false);
-    final _categoryStore = Provider.of<CategoryStore>(context, listen: false);
+    final _ttsService = context.read(ttsProvider);
 
     return Scaffold(
       body: SafeArea(
         child: FutureBuilder(
-            future: _categoryStore.getAllAsync(),
+            future: context.read(categoryNotifier).getAllAsync(),
             builder: (ctx, snp) {
               if (snp.connectionState != ConnectionState.done) {
                 return Container(
@@ -33,10 +27,12 @@ class _ImagesViewState extends State<ImagesView> {
                   child: Center(child: CircularProgressIndicator()),
                 );
               }
-              return Observer(builder: (_) {
-                return RefreshIndicator(
-                  onRefresh: _categoryStore.getAllAsync,
-                  child: GridView.builder(
+              return RefreshIndicator(
+                onRefresh: context.read(categoryNotifier).getAllAsync,
+                child: Consumer(builder: (context, watch, child) {
+                  final _categoryNotifier = watch(categoryNotifier.state);
+
+                  return GridView.builder(
                     padding: const EdgeInsets.all(10),
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 3,
@@ -44,16 +40,19 @@ class _ImagesViewState extends State<ImagesView> {
                       mainAxisSpacing: 20,
                       crossAxisSpacing: 1,
                     ),
-                    itemCount: _categoryStore.images.length,
+                    itemCount: _categoryNotifier.images.length,
                     itemBuilder: (ctx, i) => ClipRRect(
                       borderRadius: BorderRadius.circular(10),
                       child: GestureDetector(
-                        onLongPress: () => _handleLongPressAsync(_categoryStore.images[i]),
-                        onTap: () => _ttsService.speak(_categoryStore.images[i].name),
-                        onDoubleTap: () => _showBottomSheetAsync(_categoryStore.images[i]),
+                        onLongPress: () =>
+                            _handleLongPressAsync(_categoryNotifier.images[i]),
+                        onTap: () =>
+                            _ttsService.speak(_categoryNotifier.images[i].name),
+                        onDoubleTap: () =>
+                            _showBottomSheetAsync(_categoryNotifier.images[i]),
                         child: GridTile(
                           child: Image.network(
-                              '${ServicesConstants.CLOUDINARY_URL}/${_categoryStore.images[i].url}'),
+                              '${ServicesConstants.CLOUDINARY_URL}/${_categoryNotifier.images[i].url}'),
                           footer: LayoutBuilder(
                             builder: (BuildContext context,
                                     BoxConstraints constraints) =>
@@ -65,7 +64,7 @@ class _ImagesViewState extends State<ImagesView> {
                                 width: constraints.maxWidth,
                                 // decoration: BoxDecoration(borderRadius: const BorderRadius.vertical(top: Radius.circular(10))),
                                 child: Text(
-                                  '${_categoryStore.images[i].name}',
+                                  '${_categoryNotifier.images[i].name}',
                                   style: TextStyle(color: Colors.black),
                                   textAlign: TextAlign.center,
                                   softWrap: true,
@@ -76,12 +75,12 @@ class _ImagesViewState extends State<ImagesView> {
                         ),
                       ),
                     ),
-                  ),
-                );
-              });
+                  );
+                }),
+              );
             }),
       ),
-      floatingActionButton: _userStore.isAuthenticated
+      floatingActionButton: context.read(userStateNotifier).isAuthenticated()
           ? FloatingActionButton(
               tooltip: 'Adicionar Imagem',
               onPressed: _showBottomSheetAsync,
@@ -97,7 +96,8 @@ class _ImagesViewState extends State<ImagesView> {
   }
 
   Future _showBottomSheetAsync([Images.Image image]) async {
-    if (image != null && image.categoryId != ApplicationConstants.categorialPessoalId) return;
+    if (image != null &&
+        image.categoryId != ApplicationConstants.categorialPessoalId) return;
 
     return showModalBottomSheet(
       context: context,
@@ -132,7 +132,8 @@ class _ImagesViewState extends State<ImagesView> {
                       style: TextStyle(color: Colors.red),
                     ),
                     onPressed: () async {
-                      await Provider.of<CategoryStore>(context, listen: false)
+                      await context
+                          .read(categoryNotifier)
                           .removeImageAsync(image);
                       Navigator.of(context).pop();
                     })

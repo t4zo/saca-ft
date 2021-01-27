@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:saca/constants/application.constants.dart';
 import 'package:saca/constants/services.constants.dart';
 import 'package:saca/models/image.model.dart' as Images;
-import 'package:saca/services/tts.service.dart';
+import 'package:saca/providers.dart';
 
-import 'package:saca/stores/user.store.dart';
-import 'package:saca/stores/category.store.dart';
 import 'package:saca/widgets/create_update_image.modal.dart';
 
 class CategoriesView extends StatefulWidget {
@@ -18,78 +15,76 @@ class CategoriesView extends StatefulWidget {
 }
 
 class _CategoriesViewState extends State<CategoriesView> {
-  final _ttsService = TtsService();
-
   @override
   Widget build(BuildContext context) {
-    final _userStore = Provider.of<UserStore>(context, listen: false);
-    final _categoryStore = Provider.of<CategoryStore>(context, listen: false);
+  final _ttsService = context.read(ttsProvider);
 
     return Scaffold(
       body: SafeArea(
         child: FutureBuilder(
-          future: _categoryStore.getAllAsync(),
-          builder: (ctx, snp) {
-            if (snp.connectionState != ConnectionState.done) {
-              return Container(
-                height: MediaQuery.of(context).size.height,
-                child: Center(child: CircularProgressIndicator()),
-              );
-            }
-            return Observer(
-              builder: (_) => RefreshIndicator(
-                onRefresh: _categoryStore.getAllAsync,
-                child: SingleChildScrollView(
-                  child: ExpansionPanelList(
-                    expandedHeaderPadding: const EdgeInsets.all(0),
-                    expansionCallback: (index, isExpanded) {
-                      _categoryStore.toggleExpanded(index, isExpanded);
-                    },
-                    children: _categoryStore.categories
-                        .map<ExpansionPanel>(
-                          (category) => ExpansionPanel(
-                            headerBuilder: (context, isExpanded) => ListTile(
-                              title: Text(category.name),
-                            ),
-                            canTapOnHeader: true,
-                            isExpanded: category.isExpanded,
-                            body: Wrap(
-                              direction: Axis.horizontal,
-                              alignment: WrapAlignment.spaceEvenly,
-                              spacing: 20,
-                              runSpacing: 20,
-                              children: category.images.map((image) {
-                                return Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 16),
-                                  child: GestureDetector(
-                                    onLongPress: () =>
-                                        _handleLongPressAsync(image),
-                                    onTap: () => _ttsService.speak(image.name),
-                                    onDoubleTap: () =>
-                                        _showBottomSheetAsync(image),
-                                    child: Column(
-                                      children: <Widget>[
-                                        Image.network(
-                                            '${ServicesConstants.CLOUDINARY_URL}/${image.fullyQualifiedPublicUrl}'),
-                                        Text('${image.name}')
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
-                            ),
-                          ),
-                        )
-                        .toList(),
-                  ),
-                ),
-              ),
-            );
-          },
-        ),
+            future: context.read(categoryNotifier).getAllAsync(),
+            builder: (BuildContext ctx, snp) {
+              if (snp.connectionState != ConnectionState.done) {
+                return Container(
+                  height: MediaQuery.of(context).size.height,
+                  child: Center(child: CircularProgressIndicator()),
+                );
+              }
+              return RefreshIndicator(
+                  onRefresh: context.read(categoryNotifier).getAllAsync,
+                  child: SingleChildScrollView(
+                    child: Consumer(builder: (context, watch, child) {
+                      final _categoryState = watch(categoryNotifier.state);
+                      return ExpansionPanelList(
+                        expandedHeaderPadding: const EdgeInsets.all(0),
+                        expansionCallback: (index, isExpanded) => context
+                            .read(categoryNotifier)
+                            .toggleExpanded(index, isExpanded),
+                        children: _categoryState.categoriesViewModel
+                            .map<ExpansionPanel>(
+                              (category) => ExpansionPanel(
+                                headerBuilder: (context, isExpanded) =>
+                                    ListTile(title: Text(category.name)),
+                                canTapOnHeader: true,
+                                isExpanded: category.isExpanded,
+                                body: Wrap(
+                                  direction: Axis.horizontal,
+                                  alignment: WrapAlignment.spaceEvenly,
+                                  spacing: 20,
+                                  runSpacing: 20,
+                                  children: category.images
+                                      .map(
+                                        (image) => Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 16),
+                                          child: GestureDetector(
+                                            onLongPress: () =>
+                                                _handleLongPressAsync(image),
+                                            onTap: () =>
+                                                _ttsService.speak(image.name),
+                                            onDoubleTap: () =>
+                                                _showBottomSheetAsync(image),
+                                            child: Column(
+                                              children: <Widget>[
+                                                Image.network(
+                                                    '${ServicesConstants.CLOUDINARY_URL}/${image.fullyQualifiedPublicUrl}'),
+                                                Text('${image.name}')
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                      .toList(),
+                                ),
+                              ),
+                            )
+                            .toList(),
+                      );
+                    }),
+                  ));
+            }),
       ),
-      floatingActionButton: _userStore.isAuthenticated
+      floatingActionButton: context.read(userStateNotifier).isAuthenticated()
           ? FloatingActionButton(
               tooltip: 'Adicionar Imagem',
               onPressed: _showBottomSheetAsync,
@@ -140,7 +135,8 @@ class _CategoriesViewState extends State<CategoriesView> {
                       style: TextStyle(color: Colors.red),
                     ),
                     onPressed: () async {
-                      await Provider.of<CategoryStore>(context, listen: false)
+                      await context
+                          .read(categoryNotifier)
                           .removeImageAsync(image);
                       Navigator.of(context).pop();
                     })

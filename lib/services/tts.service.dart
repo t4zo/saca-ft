@@ -8,9 +8,7 @@ class TtsService {
     configureTts();
   }
 
-  FlutterTts get flutterTts {
-    return flutterTts;
-  }
+  FlutterTts get flutterTts => _flutterTts;
 
   void configureTts() async {
     await _flutterTts.setLanguage('pt-BR');
