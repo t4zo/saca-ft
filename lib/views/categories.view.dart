@@ -33,46 +33,48 @@ class _CategoriesViewState extends State<CategoriesView> {
               return RefreshIndicator(
                   onRefresh: context.read(categoryNotifier).getAllAsync,
                   child: SingleChildScrollView(
-                    child: Consumer(builder: (context, watch, child) {
-                      final _categoryState = watch(categoryNotifier.state);
-                      return ExpansionPanelList(
-                        expandedHeaderPadding: const EdgeInsets.all(0),
-                        expansionCallback: (index, isExpanded) => context.read(categoryNotifier).toggleExpanded(index, isExpanded),
-                        children: _categoryState.categoriesViewModel
-                            .map<ExpansionPanel>(
-                              (category) => ExpansionPanel(
-                                headerBuilder: (context, isExpanded) => ListTile(title: Text(category.name)),
-                                canTapOnHeader: true,
-                                isExpanded: category.isExpanded,
-                                body: Wrap(
-                                  direction: Axis.horizontal,
-                                  alignment: WrapAlignment.spaceEvenly,
-                                  spacing: 20,
-                                  runSpacing: 20,
-                                  children: category.images
-                                      .map(
-                                        (image) => Padding(
-                                          padding: const EdgeInsets.symmetric(vertical: 16),
-                                          child: GestureDetector(
-                                            onLongPress: () => _handleLongPressAsync(image),
-                                            onTap: () => _ttsService.speak(image.name),
-                                            onDoubleTap: () => _showBottomSheetAsync(image),
-                                            child: Column(
-                                              children: <Widget>[
-                                                Image.network('${ServicesConstants.CLOUDINARY_URL}/${image.fullyQualifiedPublicUrl}'),
-                                                Text('${image.name}')
-                                              ],
+                    child: Consumer(
+                      builder: (context, watch, child) {
+                        final _categoryState = watch(categoryNotifier.state);
+                        return ExpansionPanelList(
+                          expandedHeaderPadding: const EdgeInsets.all(0),
+                          expansionCallback: (index, isExpanded) => context.read(categoryNotifier).toggleExpanded(index, isExpanded),
+                          children: _categoryState.categoriesViewModel
+                              .map<ExpansionPanel>(
+                                (category) => ExpansionPanel(
+                                  headerBuilder: (context, isExpanded) => ListTile(title: Text(category.name)),
+                                  canTapOnHeader: true,
+                                  isExpanded: category.isExpanded,
+                                  body: Wrap(
+                                    direction: Axis.horizontal,
+                                    alignment: WrapAlignment.spaceEvenly,
+                                    spacing: 20,
+                                    runSpacing: 20,
+                                    children: category.images
+                                        .map(
+                                          (image) => Padding(
+                                            padding: const EdgeInsets.symmetric(vertical: 16),
+                                            child: GestureDetector(
+                                              onLongPress: () => _handleLongPressAsync(image),
+                                              onTap: () => _ttsService.speak(image.name),
+                                              onDoubleTap: () => _showBottomSheetAsync(image),
+                                              child: Column(
+                                                children: <Widget>[
+                                                  Image.network('${ServicesConstants.CLOUDINARY_URL}/${image.fullyQualifiedPublicUrl}'),
+                                                  Text('${image.name}')
+                                                ],
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                      )
-                                      .toList(),
+                                        )
+                                        .toList(),
+                                  ),
                                 ),
-                              ),
-                            )
-                            .toList(),
-                      );
-                    }),
+                              )
+                              .toList(),
+                        );
+                      },
+                    ),
                   ));
             }),
       ),
