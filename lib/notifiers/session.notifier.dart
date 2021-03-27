@@ -48,7 +48,7 @@ class SessionStore extends StateNotifier<SessionState> {
   }
 
   Future<String> signUpAsync(SignUpViewModel model) async {
-    final http = await _userRepository.signUp(model);
+    final http = await _userRepository.signUpAsync(model);
     if (http.error != null) return http.errorMessage;
 
     _userStateNotifier.setUser(http.response);
