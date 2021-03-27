@@ -28,7 +28,7 @@ class CreateUpdateImage extends StatefulWidget {
 }
 
 class _CreateUpdateImageState extends State<CreateUpdateImage> {
-  final _scaffoldKey = GlobalKey<ScaffoldState>();
+  final _scaffoldKey = GlobalKey<ScaffoldMessengerState>();
   final _form = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   File _image;

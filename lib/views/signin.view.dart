@@ -99,25 +99,27 @@ class _SignInViewState extends State<SignInView> {
                             ),
                             Align(
                               alignment: Alignment.centerLeft,
-                              child: FlatButton(
+                              child: Padding(
                                 padding: const EdgeInsets.only(left: 0),
-                                child: context.read(userStateNotifier.state).isAuthenticated
-                                    ? Text('Remover conta', style: TextStyle(color: Colors.red, fontWeight: FontWeight.w700))
-                                    : Text('Esqueceu a senha?'),
-                                onPressed: () => _userStateNotifier.isAuthenticated ? _handleRemoveAccount : _handleRecoverPassword,
+                                child: TextButton(
+                                  child: context.read(userStateNotifier.state).isAuthenticated
+                                      ? Text('Remover conta', style: TextStyle(color: Colors.red, fontWeight: FontWeight.w700))
+                                      : Text('Esqueceu a senha?'),
+                                  onPressed: () => _userStateNotifier.isAuthenticated ? _handleRemoveAccount : _handleRecoverPassword,
+                                ),
                               ),
                             ),
                           ],
                         ),
                       ),
                     ),
-                    RaisedButton(
+                    ElevatedButton(
                       child: signInViewModel.busy
                           ? SizedBox(height: 15, child: const CircularProgressIndicator(strokeWidth: 3))
                           : Text(!context.read(userStateNotifier.state).isAuthenticated ? 'Entrar' : 'Sair'),
-                      elevation: 2,
-                      color: Theme.of(context).primaryColor,
-                      textColor: Theme.of(context).primaryTextTheme.headline6.color,
+                      // elevation: 2,
+                      // color: Theme.of(context).primaryColor,
+                      // textColor: Theme.of(context).primaryTextTheme.headline6.color,
                       onPressed: _handleSignInAndSignOutAsync,
                     ),
                   ],
@@ -153,7 +155,7 @@ class _SignInViewState extends State<SignInView> {
       if (result.isEmpty) {
         Navigator.pushNamed(context, CategoriesView.routeName);
       } else {
-        Scaffold.of(context).showSnackBar(SnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text(result),
         ));
       }

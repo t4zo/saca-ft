@@ -20,7 +20,7 @@ class Category {
     iconName = json['iconName'];
     userCategories = json['userCategories'];
     if (json['images'] != null) {
-      images = new List<Image>();
+      images = <Image>[];
       json['images'].forEach((v) {
         images.add(new Image.fromJson(v));
       });

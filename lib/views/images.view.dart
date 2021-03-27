@@ -110,14 +110,14 @@ class _ImagesViewState extends State<ImagesView> {
               title: const Text('Remover Imagem'),
               content: Text('Tem certeza que deseja remover ${image.name}?'),
               actions: <Widget>[
-                FlatButton(
+                TextButton(
                   child: Text(
                     'Voltar',
                     style: TextStyle(color: Theme.of(context).textTheme.headline6.color),
                   ),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
-                FlatButton(
+                TextButton(
                     child: const Text(
                       'Remover',
                       style: TextStyle(color: Colors.red),

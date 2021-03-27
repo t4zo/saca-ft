@@ -152,7 +152,7 @@ class _SignUpScreenView extends State<SignUpView> {
     if (response.isEmpty) {
       await sessionStore.signInAsync(SignInViewModel(email: signUpViewModel.email, password: signUpViewModel.password));
     } else {
-      Scaffold.of(context).showSnackBar(SnackBar(content: Text(response)));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(response)));
     }
   }
 }
