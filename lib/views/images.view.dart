@@ -7,6 +7,8 @@ import 'package:saca/providers.dart';
 import 'package:saca/widgets/create_update_image.modal.dart';
 
 class ImagesView extends StatefulWidget {
+  static final routeName = '/images';
+
   @override
   _ImagesViewState createState() => _ImagesViewState();
 }

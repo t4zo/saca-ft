@@ -129,10 +129,6 @@ class _SignUpScreenView extends State<SignUpView> {
                           await _handleSignUpAsync();
                           if (context.read(userStateNotifier).isAuthenticated()) {
                             return Navigator.pushNamed(context, CategoriesView.routeName);
-                          } else {
-                            return Future.value(
-                              Container(width: 0, height: 0),
-                            );
                           }
                         }),
                   ],
